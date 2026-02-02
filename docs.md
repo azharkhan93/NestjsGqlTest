@@ -88,3 +88,29 @@ sequenceDiagram
 1.  **Maintainability**: If you want to switch from GraphQL to REST, you only change the **Presentation** layer. Your business logic (Application/Domain) stays exactly the same.
 2.  **Testing**: You can test the business logic (`ItemsService`) easily without needing to start a server or make HTTP requests.
 3.  **Organization**: As the project grows to 100+ files, having strict folders prevents "spaghetti code" where everything is mixed together.
+## 6. Security Architecture
+Strategies for securing the application across different layers:
+
+### A. Infrastructure Layer (Middleware)
+**"The Castle Walls"** - First line of defense for every request.
+*   **Helmet**: Sets secure HTTP headers (XSS Filter, HSTS, No-Sniff) to prevent common browser-based attacks.
+*   **Throttler (Rate Limiting)**: Prevents DDoS and brute-force attacks by limiting request frequency.
+*   **CORS**: Restricts which domains can access the API.
+
+### B. Presentation Layer (Guards & Interceptors)
+**"The Gatekeepers"** - Checks credentials and identity.
+*   **Authentication Guards (`JwtAuthGuard`)**: Verifies the user's identity via JWT.
+*   **Authorization Guards (`RolesGuard`)**: Checks if the verified user has permission (e.g., ADMIN vs USER).
+*   **Interceptors**: Can effect response data (e.g., stripping sensitive fields).
+
+### C. Application Layer (Validation)
+**"The Checkpoint"** - Validates input data integrity.
+*   **Validation Pipes**: Ensures data conforms to DTOs using `class-validator` (e.g., email format, min length). This prevents Malformed Data and some Injection attacks.
+
+### D. Domain Layer (Logic)
+**"The VaultRule"** - Business logic security.
+*   **Business Rules**: Logic validation (e.g., "Cannot withdraw more than balance").
+
+### Implementation Location
+*   **Global Security**: `src/common/security` (Shared guards, rate limiters).
+*   **Module Security**: `src/modules/auth` (Login logic, Token generation).
