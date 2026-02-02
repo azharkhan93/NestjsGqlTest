@@ -5,11 +5,11 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
-import { ItemsModule } from './modules/items/items.module';
+import { ModulesModule } from './modules/modules.module';
 
 @Module({
   imports: [
-    ItemsModule,
+    ModulesModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),

@@ -10,4 +10,10 @@ export class Item {
 
   @Field({ nullable: true })
   description?: string;
+
+  @Field()
+  createdAt: Date;
+
+  @Field()
+  updatedAt: Date;
 }

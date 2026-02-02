@@ -2,53 +2,44 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemInput } from '../dtos/create-item.dto';
 import { UpdateItemInput } from '../dtos/update-item.dto';
 import { ItemEntity } from '../../domain/entities/item.entity';
+import { IItemRepository } from '../../domain/repositories/item.repository.interface';
 
 @Injectable()
 export class ItemsService {
-  private items: ItemEntity[] = [];
-  private idCounter = 1;
+  constructor(private readonly itemRepository: IItemRepository) {}
 
-  create(createItemInput: CreateItemInput): ItemEntity {
-    const newItem: ItemEntity = {
-      id: this.idCounter++,
-      ...createItemInput,
-    };
-    this.items.push(newItem);
-    return newItem;
+  async create(createItemInput: CreateItemInput): Promise<ItemEntity> {
+    const newItem = new ItemEntity();
+    Object.assign(newItem, createItemInput);
+    // Repository handles ID generation and timestamps
+    return this.itemRepository.create(newItem);
   }
 
-  findAll(): ItemEntity[] {
-    return this.items;
+  async findAll(): Promise<ItemEntity[]> {
+    return this.itemRepository.findAll();
   }
 
-  findOne(id: number): ItemEntity {
-    const item = this.items.find((item) => item.id === id);
+  async findOne(id: number): Promise<ItemEntity> {
+    const item = await this.itemRepository.findOne(id);
     if (!item) {
       throw new NotFoundException(`Item with ID ${id} not found`);
     }
     return item;
   }
 
-  update(id: number, updateItemInput: UpdateItemInput): ItemEntity {
-    const itemIndex = this.items.findIndex((item) => item.id === id);
-    if (itemIndex === -1) {
+  async update(id: number, updateItemInput: UpdateItemInput): Promise<ItemEntity> {
+    const updatedItem = await this.itemRepository.update(id, updateItemInput);
+    if (!updatedItem) {
       throw new NotFoundException(`Item with ID ${id} not found`);
     }
-    const updatedItem = {
-      ...this.items[itemIndex],
-      ...updateItemInput,
-    };
-    this.items[itemIndex] = updatedItem;
     return updatedItem;
   }
 
-  remove(id: number): ItemEntity {
-    const itemIndex = this.items.findIndex((item) => item.id === id);
-    if (itemIndex === -1) {
+  async remove(id: number): Promise<ItemEntity> {
+    const removedItem = await this.itemRepository.remove(id);
+    if (!removedItem) {
       throw new NotFoundException(`Item with ID ${id} not found`);
     }
-    const removedItem = this.items[itemIndex];
-    this.items.splice(itemIndex, 1);
     return removedItem;
   }
 }

@@ -47,25 +47,35 @@ src/
     *   **Types**: The GraphQL schemas (ObjectTypes) that clients see.
 *   **Rules**: Depends on the Application layer to do the actual work. It just invokes the service.
 
-## 4. Data Flow (How a Request is Processed)
-When a user sends a request to create an item, the data travels through the layers in a specific order.
+### Layer 4: Infrastructure (`src/modules/items/infrastructure`)
+**"The Engine Room"**
+*   **What is it?**: This layer handles the "dirty details" of data access and external systems. It implements the interfaces defined by the Domain layer.
+*   **Components**:
+    *   **Persistence**: Handles database operations.
+        *   **Entities**: Database-specific schemas (e.g., TypeORM Entity, Mongoose Schema).
+        *   **Repositories**: Implementation of Domain Repositories `IItemRepository`. Contains the actual SQL/Mongo queries.
+        *   **Mappers**: Converts between Domain Entities (Pure) and Persistence Entities (Database).
+*   **Rules**: Depends on Domain Layer (interfaces) and Application Layer.
+
+## 4. Data Flow (Detail with Infrastructure)
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant Resolver as Presentation (Resolver)
     participant Service as Application (Service)
-    participant Domain as Domain (Entity)
+    participant Repo as Infrastructure (Repository)
+    participant DB as Database
 
     Client->>Resolver: Mutation: createItem(name: "New Item")
-    Note over Resolver: 1. Receive Request & Validate Input
     Resolver->>Service: itemsService.create(dto)
-    Note over Service: 2. Execute Business Logic
-    Service->>Domain: Create new ItemEntity
-    Domain-->>Service: Return ItemEntity
-    Service-->>Resolver: Return ItemEntity
-    Note over Resolver: 3. Map to GraphQL Type
-    Resolver-->>Client: Return Response { id, name }
+    Service->>Repo: itemRepository.create(itemEntity)
+    Note right of Service: Service doesn't know IT IS TypeORM/Mongo
+    Repo->>DB: INSERT INTO items ...
+    DB-->>Repo: Return Record
+    Repo-->>Service: Return Domain Entity
+    Service-->>Resolver: Return Domain Entity
+    Resolver-->>Client: Return Response
 ```
 
 ### Step-by-Step Flow:
