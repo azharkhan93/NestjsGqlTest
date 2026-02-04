@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateItemInput } from '../dtos/create-item.dto';
-import { UpdateItemInput } from '../dtos/update-item.dto';
+import { CreateItemInput } from '../../presentation/graphql/dto/create-item.input';
+import { UpdateItemInput } from '../../presentation/graphql/dto/update-item.input';
 import { ItemEntity } from '../../domain/entities/item.entity';
 import { IItemRepository } from '../../domain/repositories/item.repository.interface';
 
@@ -19,7 +19,7 @@ export class ItemsService {
     return this.itemRepository.findAll();
   }
 
-  async findOne(id: number): Promise<ItemEntity> {
+  async findOne(id: string): Promise<ItemEntity> {
     const item = await this.itemRepository.findOne(id);
     if (!item) {
       throw new NotFoundException(`Item with ID ${id} not found`);
@@ -27,7 +27,7 @@ export class ItemsService {
     return item;
   }
 
-  async update(id: number, updateItemInput: UpdateItemInput): Promise<ItemEntity> {
+  async update(id: string, updateItemInput: UpdateItemInput): Promise<ItemEntity> {
     const updatedItem = await this.itemRepository.update(id, updateItemInput);
     if (!updatedItem) {
       throw new NotFoundException(`Item with ID ${id} not found`);
@@ -35,7 +35,7 @@ export class ItemsService {
     return updatedItem;
   }
 
-  async remove(id: number): Promise<ItemEntity> {
+  async remove(id: string): Promise<ItemEntity> {
     const removedItem = await this.itemRepository.remove(id);
     if (!removedItem) {
       throw new NotFoundException(`Item with ID ${id} not found`);

@@ -1,8 +1,8 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ItemsService } from '../../application/services/items.service';
 import { Item } from './types/item.type';
-import { CreateItemInput } from '../../application/dtos/create-item.dto';
-import { UpdateItemInput } from '../../application/dtos/update-item.dto';
+import { CreateItemInput } from './dto/create-item.input';
+import { UpdateItemInput } from './dto/update-item.input';
 
 @Resolver(() => Item)
 export class ItemsResolver {
@@ -19,7 +19,7 @@ export class ItemsResolver {
   }
 
   @Query(() => Item, { name: 'item' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id', { type: () => String }) id: string) {
     return this.itemsService.findOne(id);
   }
 
@@ -29,7 +29,7 @@ export class ItemsResolver {
   }
 
   @Mutation(() => Item)
-  removeItem(@Args('id', { type: () => Int }) id: number) {
+  removeItem(@Args('id', { type: () => String }) id: string) {
     return this.itemsService.remove(id);
   }
 }
