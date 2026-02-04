@@ -6,9 +6,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 import { ModulesModule } from './modules/modules.module';
+import { PrismaModule } from './common/infrastructure/persistence/prisma/prisma.module';
 
 @Module({
   imports: [
+    PrismaModule,
     ModulesModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
