@@ -3,6 +3,7 @@ import { IItemRepository } from '@modules/items/domain/repositories/item.reposit
 import { ItemEntity } from '@modules/items/domain/entities';
 import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
 import { Item as PrismaItem } from '@prisma/client';
+import { ItemName } from '@modules/items/domain/value-objects/item-name.vo';
 
 @Injectable()
 export class ItemRepository
@@ -16,7 +17,7 @@ export class ItemRepository
   toEntity(model: PrismaItem): ItemEntity {
     const entity = new ItemEntity();
     entity.id = model.id;
-    entity.name = model.name;
+    entity.name = ItemName.create(model.name);
     entity.description = model.description ?? undefined;
     entity.createdAt = model.createdAt;
     entity.updatedAt = model.updatedAt;
@@ -26,7 +27,7 @@ export class ItemRepository
   toPrisma(entity: ItemEntity): any {
     return {
       id: entity.id,
-      name: entity.name,
+      name: entity.name.value,
       description: entity.description,
     };
   }

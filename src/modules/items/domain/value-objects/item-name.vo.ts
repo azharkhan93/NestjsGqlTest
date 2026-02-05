@@ -1,6 +1,6 @@
 
 import { BadRequestException } from '@nestjs/common';
-import { ValueObject } from 'src/common/domain/value-objects/value-object.base';
+import { ValueObject } from '@common/domain/value-objects/value-object.base';
 
 interface ItemNameProps {
   value: string;
