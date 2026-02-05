@@ -1,6 +1,7 @@
+import { IRepository } from '@common/domain/repositories';
 import { PrismaService } from './prisma.service';
-import { IRepository } from '../../../domain/repositories/repository.interface';
-import { BaseEntity } from '../../../domain/entities/base.entity';
+
+import { BaseEntity } from '@common/domain/entities';
 
 export abstract class PrismaRepository<T extends BaseEntity, PrismaModel> implements IRepository<T> {
   constructor(

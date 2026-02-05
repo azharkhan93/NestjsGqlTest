@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateItemInput } from '../dtos/create-item.input';
-import { UpdateItemInput } from '../dtos/update-item.input';
-import { ItemEntity } from '../../domain/entities/item.entity';
-import { IItemRepository } from '../../domain/repositories/item.repository.interface';
-import { ItemName } from '../../domain/value-objects/item-name.vo';
+import { CreateItemInput, UpdateItemInput } from '@modules/items/application/dtos';
+import { ItemEntity } from '@modules/items/domain/entities';
+import { IItemRepository } from '@modules/items/domain/repositories/item.repository.interface';
+import { ItemName } from '@modules/items/domain/value-objects';
 
 @Injectable()
 export class ItemsService {
@@ -43,10 +42,10 @@ export class ItemsService {
   }
 
   async remove(id: string): Promise<ItemEntity> {
-    const removedItem = await this.itemRepository.remove(id);
-    if (!removedItem) {
+    const deletedItem = await this.itemRepository.remove(id);
+    if (!deletedItem) {
       throw new NotFoundException(`Item with ID ${id} not found`);
     }
-    return removedItem;
+    return deletedItem;
   }
 }

@@ -1,5 +1,5 @@
 import { BaseEntity } from '@common/domain/entities';
-import { ItemName } from '../value-objects/item-name.vo';
+import { ItemName } from '@modules/items/domain/value-objects';
 
 export class ItemEntity extends BaseEntity {
   name: ItemName;
