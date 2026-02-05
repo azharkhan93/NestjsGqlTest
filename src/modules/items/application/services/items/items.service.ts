@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateItemInput, UpdateItemInput } from '@modules/items/application/dtos';
+import { CreateItemInput, UpdateItemInput } from '@modules/items/presentation/graphql/inputs';
 import { ItemEntity } from '@modules/items/domain/entities';
 import { IItemRepository } from '@modules/items/domain/repositories/item.repository.interface';
 import { ItemName } from '@modules/items/domain/value-objects';
