@@ -3,7 +3,10 @@ import { PrismaService } from './prisma.service';
 
 import { BaseEntity } from '@common/domain/entities/index';
 
-export abstract class PrismaRepository<T extends BaseEntity, PrismaModel> implements IRepository<T> {
+export abstract class PrismaRepository<
+  T extends BaseEntity,
+  PrismaModel,
+> implements IRepository<T> {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly modelName: string,
@@ -14,7 +17,7 @@ export abstract class PrismaRepository<T extends BaseEntity, PrismaModel> implem
   }
 
   abstract toEntity(model: PrismaModel): T;
-  abstract toPrisma(entity: T): any;
+  abstract toPrisma(entity: T): Record<string, unknown>;
 
   async create(item: T): Promise<T> {
     const data = this.toPrisma(item);

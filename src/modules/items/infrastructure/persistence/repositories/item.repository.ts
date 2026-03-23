@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { IItemRepository } from '@modules/items/domain/repositories/item.repository.interface';
 import { ItemEntity } from '@modules/items/domain/entities';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { Item as PrismaItem } from '@prisma/client';
 import { ItemName } from '@modules/items/domain/value-objects/item-name.vo';
 
@@ -24,7 +27,7 @@ export class ItemRepository
     return entity;
   }
 
-  toPrisma(entity: ItemEntity): any {
+  toPrisma(entity: ItemEntity): Record<string, unknown> {
     return {
       id: entity.id,
       name: entity.name.value,

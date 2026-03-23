@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateItemInput, UpdateItemInput } from '@modules/items/presentation/graphql/inputs';
+import {
+  CreateItemInput,
+  UpdateItemInput,
+} from '@modules/items/presentation/graphql/inputs';
 import { ItemEntity } from '@modules/items/domain/entities';
 import { IItemRepository } from '@modules/items/domain/repositories/item.repository.interface';
 import { ItemName } from '@modules/items/domain/value-objects';
@@ -12,7 +15,7 @@ export class ItemsService {
     const newItem = new ItemEntity();
     newItem.name = ItemName.create(createItemInput.name);
     newItem.description = createItemInput.description;
-    
+
     return this.itemRepository.create(newItem);
   }
 
@@ -28,12 +31,16 @@ export class ItemsService {
     return item;
   }
 
-  async update(id: string, updateItemInput: UpdateItemInput): Promise<ItemEntity> {
-    const updateData: any = { ...updateItemInput };
-    if (updateItemInput.name) {
-      updateData.name = ItemName.create(updateItemInput.name);
-    }
-    
+  async update(
+    id: string,
+    updateItemInput: UpdateItemInput,
+  ): Promise<ItemEntity> {
+    const { id: _, name, description } = updateItemInput;
+    const updateData: Partial<ItemEntity> = {
+      ...(name ? { name: ItemName.create(name) } : {}),
+      ...(description ? { description } : {}),
+    };
+
     const updatedItem = await this.itemRepository.update(id, updateData);
     if (!updatedItem) {
       throw new NotFoundException(`Item with ID ${id} not found`);

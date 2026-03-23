@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 type Item {
-  id: Int!
+  id: String!
   name: String!
   description: String
   createdAt: DateTime!
@@ -18,13 +18,13 @@ scalar DateTime
 type Query {
   hello: String!
   items: [Item!]!
-  item(id: Int!): Item!
+  item(id: String!): Item!
 }
 
 type Mutation {
   createItem(createItemInput: CreateItemInput!): Item!
   updateItem(updateItemInput: UpdateItemInput!): Item!
-  removeItem(id: Int!): Item!
+  removeItem(id: String!): Item!
 }
 
 input CreateItemInput {
@@ -35,5 +35,5 @@ input CreateItemInput {
 input UpdateItemInput {
   name: String
   description: String
-  id: Int!
+  id: String!
 }
