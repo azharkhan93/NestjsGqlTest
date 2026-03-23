@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ItemsModule } from './items/items.module';
 
-import { AuthModule } from './auth/auth.module';
+import { RolesModule } from './roles/roles.module';
+import { TwilioModule } from './twilio/twilio.module';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
-  imports: [ItemsModule, AuthModule],
+  imports: [RolesModule, TwilioModule, VerificationModule],
 })
 export class ModulesModule {}

@@ -2,12 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Item {
-  id: String!
-  name: String!
-  description: String
+type Role {
+  id: ID!
+  name: UserRole!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+"""Available user roles"""
+enum UserRole {
+  CUSTOMER
+  PROVIDER
 }
 
 """
@@ -15,25 +20,22 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type SmsResponse {
+  success: Boolean!
+  sid: String
+  message: String
+  errorCode: Float
+}
+
 type Query {
   hello: String!
-  items: [Item!]!
-  item(id: String!): Item!
+  roles: [Role!]!
+  roleById(id: String!): Role!
 }
 
 type Mutation {
-  createItem(createItemInput: CreateItemInput!): Item!
-  updateItem(updateItemInput: UpdateItemInput!): Item!
-  removeItem(id: String!): Item!
-}
-
-input CreateItemInput {
-  name: String!
-  description: String
-}
-
-input UpdateItemInput {
-  name: String
-  description: String
-  id: String!
+  createRole(name: UserRole!): Role!
+  sendSms(to: String!, message: String!): SmsResponse!
+  requestOtp(phoneNumber: String!): SmsResponse!
+  verifyOtp(phoneNumber: String!, code: String!): SmsResponse!
 }

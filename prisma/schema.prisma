@@ -3,21 +3,51 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Item {
-  id    String @id @default(uuid()) 
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  CUSTOMER
+  PROVIDER
+}
+
+model Role {
+  id        String    @id @default(uuid())
+  name      UserRole  @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  users     User[]
+
+  @@index([deletedAt])
+  @@map("roles")
+}
+
 model User {
-  id    String @id @default(uuid())
-  email String @unique
-  name  String?
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  roleId    String?   @map("role_id")
+  role      Role?     @relation(fields: [roleId], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([roleId])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Item {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@index([deletedAt])
+  @@map("items")
 }
