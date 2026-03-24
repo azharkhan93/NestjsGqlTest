@@ -35,7 +35,6 @@ type Query {
 
 type Mutation {
   createRole(name: UserRole!): Role!
-  sendSms(to: String!, message: String!): SmsResponse!
   requestOtp(phoneNumber: String!): SmsResponse!
   verifyOtp(phoneNumber: String!, code: String!): SmsResponse!
 }

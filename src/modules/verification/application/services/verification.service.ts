@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { randomInt } from 'crypto';
 
-import { PhoneNumber } from '../../domain/value-objects/phone-number.vo';
+import { PhoneNumber } from '@common/domain/value-objects/phone-number.vo';
 import { TwilioService } from '@modules/twilio/application/services/twilio.service';
 import { IVerificationRepository } from '@modules/verification/domain/repositories/verification.repository.interface';
 
