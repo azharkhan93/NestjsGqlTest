@@ -1,18 +1,24 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { VerificationService } from './application/services/verification.service';
 import { VerificationResolver } from './presentation/graphql/resolvers/verification.resolver';
-import { IVerificationService } from './domain/services/verification-service.interface';
-import { TwilioVerificationService } from './infrastructure/services/twilio-verification.service';
+import { TwilioModule } from '@modules/twilio/twilio.module';
+import { PrismaModule } from '@common/infrastructure/persistence/prisma/prisma.module';
+import { IVerificationRepository } from './domain/repositories/verification.repository.interface';
+import { PrismaVerificationRepository } from './infrastructure/persistence/prisma/prisma-verification.repository';
+import { OtpCleanupService } from './infrastructure/services/otp-cleanup.service';
 
 @Module({
+  imports: [ScheduleModule.forRoot(), TwilioModule, PrismaModule],
   providers: [
     VerificationService,
     VerificationResolver,
+    OtpCleanupService,
     {
-      provide: IVerificationService,
-      useClass: TwilioVerificationService,
+      provide: IVerificationRepository,
+      useClass: PrismaVerificationRepository,
     },
   ],
   exports: [VerificationService],
 })
-export class VerificationModule { }
+export class VerificationModule {}

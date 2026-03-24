@@ -51,3 +51,18 @@ model Item {
   @@index([deletedAt])
   @@map("items")
 }
+
+model Verification {
+  id          String    @id @default(uuid())
+  phoneNumber String    @map("phone_number")
+  code        String
+  expiresAt   DateTime  @map("expires_at")
+  isUsed      Boolean   @default(false) @map("is_used")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@index([phoneNumber, code])
+  @@index([deletedAt])
+  @@map("verifications")
+}
