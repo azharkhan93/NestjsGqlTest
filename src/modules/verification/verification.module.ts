@@ -15,4 +15,4 @@ import { TwilioVerificationService } from './infrastructure/services/twilio-veri
   ],
   exports: [VerificationService],
 })
-export class VerificationModule {}
+export class VerificationModule { }

@@ -4,7 +4,7 @@ import { PhoneNumber } from '../../domain/value-objects/phone-number.vo';
 
 @Injectable()
 export class VerificationService {
-  constructor(private readonly verificationProvider: IVerificationService) {}
+  constructor(private readonly verificationProvider: IVerificationService) { }
 
   async requestOtp(rawPhone: string) {
     const phoneNumber = PhoneNumber.create(rawPhone);
