@@ -1,0 +1,37 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import { UserEntity } from '@modules/users/domain/entities/user.entity';
+import { User as PrismaUser } from '@prisma/client';
+import { IUserRepository } from '@modules/users/domain/repositories/user.repository.interface';
+
+@Injectable()
+export class PrismaUserRepository
+  extends PrismaRepository<UserEntity, PrismaUser>
+  implements IUserRepository
+{
+  constructor(prisma: PrismaService) {
+    super(prisma, 'user');
+  }
+
+  async findByPhoneNumber(phoneNumber: string): Promise<UserEntity | null> {
+    const user = await this.model.findUnique({ where: { phoneNumber } });
+    return user ? this.toEntity(user) : null;
+  }
+
+  toEntity(model: PrismaUser): UserEntity {
+    return new UserEntity({
+      ...model,
+      name: model.name ?? undefined,
+      roleId: model.roleId ?? undefined,
+      deletedAt: model.deletedAt ?? undefined,
+    });
+  }
+
+  toPrisma(entity: UserEntity): any {
+    return {
+      phoneNumber: entity.phoneNumber,
+      name: entity.name,
+      roleId: entity.roleId,
+    };
+  }
+}

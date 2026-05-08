@@ -5,7 +5,9 @@ import { PhoneNumber } from '@common/domain/value-objects/phone-number.vo';
 import { TwilioService } from '@modules/twilio/application/services/twilio.service';
 import { IVerificationRepository } from '@modules/verification/domain/repositories/verification.repository.interface';
 
-const OTP_EXPIRY_MS = 2 * 60 * 1000; 
+ const OTP_EXPIRY_MS = 2 * 60 * 1000; 
+
+// const OTP_EXPIRY_MS = 10 * 1000;
 
 @Injectable()
 export class VerificationService {

@@ -27,14 +27,67 @@ type SmsResponse {
   errorCode: Float
 }
 
+type VendorProfileType {
+  id: ID!
+  userId: String!
+  businessName: String!
+  imageUri: String
+  gstNumber: String
+  contactNumber: String
+  address: String
+  serviceRadius: String
+  operatingHours: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UserType {
+  id: ID!
+  phoneNumber: String!
+  name: String
+  roleId: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   hello: String!
   roles: [Role!]!
   roleById(id: String!): Role!
+  getVendorProfile(userId: String!): VendorProfileType!
+  getVendorProfileById(id: ID!): VendorProfileType!
+  users: [UserType!]!
+  user(id: ID!): UserType!
 }
 
 type Mutation {
   createRole(name: UserRole!): Role!
   requestOtp(phoneNumber: String!): SmsResponse!
   verifyOtp(phoneNumber: String!, code: String!): SmsResponse!
+  createVendorProfile(input: CreateVendorProfileInput!): VendorProfileType!
+  updateVendorProfile(id: ID!, input: UpdateVendorProfileInput!): VendorProfileType!
+  deleteVendorProfile(id: ID!): Boolean!
+  loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): UserType!
+  deleteUser(id: ID!): Boolean!
+}
+
+input CreateVendorProfileInput {
+  userId: String!
+  businessName: String!
+  imageUri: String
+  gstNumber: String
+  contactNumber: String
+  address: String
+  serviceRadius: String
+  operatingHours: String
+}
+
+input UpdateVendorProfileInput {
+  businessName: String
+  imageUri: String
+  gstNumber: String
+  contactNumber: String
+  address: String
+  serviceRadius: String
+  operatingHours: String
 }

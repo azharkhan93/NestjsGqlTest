@@ -26,30 +26,118 @@ model Role {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String?
-  roleId    String?   @map("role_id")
-  role      Role?     @relation(fields: [roleId], references: [id])
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  id            String         @id @default(uuid())
+  phoneNumber   String         @unique @map("phone_number")
+  name          String?
+  roleId        String?        @map("role_id")
+  role          Role?          @relation(fields: [roleId], references: [id])
+  bookings      Booking[]
+  vendorProfile VendorProfile?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  deletedAt     DateTime?      @map("deleted_at")
 
   @@index([roleId])
   @@index([deletedAt])
   @@map("users")
 }
 
-model Item {
+
+model VendorProfile {
+  id             String    @id @default(uuid())
+  userId         String    @unique @map("user_id")
+  user           User      @relation(fields: [userId], references: [id])
+  businessName   String    @map("business_name")
+  imageUri       String?   @map("image_uri")
+  gstNumber      String?   @map("gst_number")
+  contactNumber  String?   @map("contact_number")
+  address        String?
+  serviceRadius  String?   @map("service_radius") // e.g. "5km", "10km", "25km"
+  operatingHours String?   @map("operating_hours")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("vendor_profiles")
+}
+
+
+model Service {
   id          String    @id @default(uuid())
   name        String
   description String?
+  price       Float
+  duration    Int // duration in minutes
+  bookings    Booking[]
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
   @@index([deletedAt])
-  @@map("items")
+  @@map("services")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  user        User          @relation(fields: [userId], references: [id])
+  serviceId   String        @map("service_id")
+  service     Service       @relation(fields: [serviceId], references: [id])
+  status      BookingStatus @default(PENDING)
+  scheduledAt DateTime      @map("scheduled_at")
+  review      Review?
+  dispute     Dispute?
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  deletedAt   DateTime?     @map("deleted_at")
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("bookings")
+}
+
+model Review {
+  id        String    @id @default(uuid())
+  bookingId String    @unique @map("booking_id")
+  booking   Booking   @relation(fields: [bookingId], references: [id])
+  rating    Int
+  comment   String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([bookingId])
+  @@index([rating])
+  @@index([deletedAt])
+  @@map("reviews")
+}
+
+model Dispute {
+  id        String    @id @default(uuid())
+  bookingId String    @unique @map("booking_id")
+  booking   Booking   @relation(fields: [bookingId], references: [id])
+  reason    String
+  status    String    @default("OPEN")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([bookingId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("disputes")
 }
 
 model Verification {

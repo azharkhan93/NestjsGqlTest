@@ -1,98 +1,120 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS GraphQL Clean Architecture Boilerplate
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This project is a high-performance, scalable boilerplate built with **NestJS**, **GraphQL (Apollo)**, and **Prisma ORM**, strictly following **Domain-Driven Design (DDD)** and **Clean Architecture** principles.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Project Overview
 
-## Description
+The system is designed for a service-based marketplace (e.g., Car Wash, Home Services) with support for:
+- **User Management**: Roles (Customer, Provider), Profiles.
+- **Service Management**: Dynamic service offerings and pricing.
+- **Booking Workflow**: Scheduling, status tracking (Pending to Completed).
+- **Verification**: SMS-based verification via Twilio.
+- **Security**: JWT Authentication and Role-based Access Control (RBAC).
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 🏗️ Architecture: DDD & Clean Architecture
 
-```bash
-$ yarn install
+The project is organized into modular features, each isolated into four distinct layers to ensure separation of concerns and testability.
+
+### 1. Folder Structure
+```text
+src/
+├── common/                  # Shared global logic
+│   ├── domain/              # Base entities, value objects, domain exceptions
+│   └── infrastructure/      # Shared database config, global security guards
+├── modules/                 # Feature-specific modules
+│   └── [feature_name]/      # e.g., roles, verification, booking
+│       ├── domain/          # Layer 1: Core business logic (Entities, Repo Interfaces)
+│       ├── application/     # Layer 2: Orchestration (Services, DTOs)
+│       ├── presentation/    # Layer 3: API Entry points (GraphQL Resolvers)
+│       ├── infrastructure/  # Layer 4: Implementation (Prisma Repositories)
+│       └── [feature].module.ts
+└── main.ts                  # Entry point
 ```
 
-## Compile and run the project
+### 2. The Layers Deep-Dive
 
+#### **Layer 1: Domain (The Core)**
+The most stable part of the system. It contains:
+- **Entities**: Business objects with unique identity (e.g., `BookingEntity`).
+- **Repository Interfaces**: Contracts that the Infrastructure layer must implement.
+- **Value Objects**: Objects defined by attributes, not identity.
+
+#### **Layer 2: Application (The Brain)**
+Orchestrates business flow.
+- **Services**: Coordinate Domain Entities and Repositories to perform tasks.
+- **DTOs**: Input and Output data shapes for the API.
+
+#### **Layer 3: Presentation (The Doorway)**
+Handles the outside world.
+- **GraphQL Resolvers**: Map incoming queries/mutations to Application Services.
+- **Types/Inputs**: GraphQL-specific schema definitions.
+
+#### **Layer 4: Infrastructure (The Engine)**
+Technical details and external integrations.
+- **Persistence**: Prisma-based implementations of Domain Repository interfaces.
+- **External Services**: Twilio SMS integration, Passport strategies.
+
+---
+
+## 🛠️ Tech Stack & Workflow
+
+### Core Technologies
+- **NestJS**: Enterprise-grade Node.js framework.
+- **GraphQL**: Apollo Server for flexible data fetching.
+- **Prisma**: Type-safe database client (PostgreSQL).
+- **Twilio**: SMS service for verification.
+- **Passport.js**: Authentication with JWT.
+
+### Standard Workflow (Request/Response)
+1. **Request**: Resolver (`Presentation`) receives a GraphQL Mutation.
+2. **Validation**: DTOs and Class-Validator ensure input integrity.
+3. **Orchestration**: Service (`Application`) receives data, fetches existing data from Repository Interface.
+4. **Logic**: Service interacts with Domain Entities (`Domain`) to apply business rules.
+5. **Persistence**: Service calls Repository implementation (`Infrastructure`) to save changes.
+6. **Response**: Data is mapped back to GraphQL Types and returned.
+
+---
+
+## 🛠️ Setup & Development
+
+### Prerequisites
+- Node.js (v18+)
+- PostgreSQL
+- Yarn or NPM
+
+### Installation
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+yarn install
 ```
 
-## Run tests
-
+### Database Setup
+1. Update `.env` with your `DATABASE_URL`.
+2. Generate Prisma client:
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+yarn prisma:generate
+```
+3. Push schema to DB:
+```bash
+npx prisma db push
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### Running the App
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+# Development mode
+yarn start:dev
+
+# Production build
+yarn build
+yarn start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📈 Quality & Organization Audit
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- **Maintainability**: High. Feature isolation ensures that changing one module doesn't break others.
+- **Scalability**: High. The DDD structure allows for hundreds of modules without clutter.
+- **Testability**: Very High. Business logic in `Domain` and `Application` layers is decoupled from the database and API.
+- **Best Practices**: Follows SOLID principles and Clean Architecture strictly.

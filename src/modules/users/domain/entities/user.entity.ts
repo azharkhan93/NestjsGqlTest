@@ -1,0 +1,17 @@
+import { BaseEntity } from '../../../../common/domain/entities/base.entity';
+
+export class UserEntity extends BaseEntity {
+  phoneNumber: string;
+  name?: string;
+  roleId?: string;
+  deletedAt?: Date;
+
+  constructor(partial: Partial<UserEntity>) {
+    super();
+    Object.assign(this, partial);
+  }
+
+  static create(data: Partial<UserEntity>): UserEntity {
+    return new UserEntity(data);
+  }
+}
