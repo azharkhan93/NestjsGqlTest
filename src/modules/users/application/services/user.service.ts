@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { IUserRepository } from '../../domain/repositories/user.repository.interface';
-import { UserEntity } from '../../domain/entities/user.entity';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { assertFound } from '@common/application/helpers';
+import { IUserRepository } from '@modules/users/domain/repositories/user.repository.interface';
+import { UserEntity } from '@modules/users/domain/entities/user.entity';
 import { VerificationService } from '@modules/verification/application/services/verification.service';
 import { RolesService } from '@modules/roles/application/services/roles.service';
-import { UserRole } from '@modules/roles/domain/entities/role.entity';
+import { UserRole } from '@common/domain/enums';
 
 @Injectable()
 export class UserService {
@@ -14,21 +15,18 @@ export class UserService {
   ) {}
 
   async loginByPhone(phoneNumber: string, code: string, roleName: UserRole): Promise<UserEntity> {
-    // 1. Verify OTP using the existing VerificationModule logic
     const isVerified = await this.verificationService.verifyOtp(phoneNumber, code);
     if (!isVerified.success) {
       throw new BadRequestException('Invalid or expired OTP');
     }
 
-    // 2. Find or Create User
     let user = await this.repository.findByPhoneNumber(phoneNumber);
-    
+
     if (!user) {
-      // Get role ID from RolesService
       const role = await this.rolesService.findByName(roleName);
-      user = await this.repository.create(UserEntity.create({ 
-        phoneNumber, 
-        roleId: role.id 
+      user = await this.repository.create(UserEntity.create({
+        phoneNumber,
+        roleId: role.id,
       }));
     }
 
@@ -40,14 +38,11 @@ export class UserService {
   }
 
   async findById(id: string): Promise<UserEntity> {
-    const user = await this.repository.findOne(id);
-    if (!user) throw new NotFoundException(`User ${id} not found`);
-    return user;
+    return assertFound(await this.repository.findOne(id), `User ${id}`);
   }
 
   async delete(id: string): Promise<boolean> {
-    const user = await this.repository.remove(id);
-    if (!user) throw new NotFoundException(`User ${id} not found`);
+    assertFound(await this.repository.remove(id), `User ${id}`);
     return true;
   }
 }

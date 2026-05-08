@@ -1,13 +1,10 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { randomInt } from 'crypto';
-
 import { PhoneNumber } from '@common/domain/value-objects/phone-number.vo';
-import { TwilioService } from '@modules/twilio/application/services/twilio.service';
+import { ISmsGateway } from '@modules/twilio/domain/ports';
 import { IVerificationRepository } from '@modules/verification/domain/repositories/verification.repository.interface';
 
- const OTP_EXPIRY_MS = 2 * 60 * 1000; 
-
-// const OTP_EXPIRY_MS = 10 * 1000;
+const OTP_EXPIRY_MS = 2 * 60 * 1000;
 
 @Injectable()
 export class VerificationService {
@@ -15,7 +12,7 @@ export class VerificationService {
 
   constructor(
     private readonly repository: IVerificationRepository,
-    private readonly twilioService: TwilioService,
+    private readonly smsGateway: ISmsGateway,
   ) {}
 
   async requestOtp(rawPhone: string) {
@@ -27,7 +24,7 @@ export class VerificationService {
 
     this.logger.log(`OTP saved for ${phoneNumber.getValue}, expires at ${expiresAt.toISOString()}`);
 
-    return this.twilioService.sendSms(
+    return this.smsGateway.sendSms(
       phoneNumber.getValue,
       `Your verification code is: ${code}. Valid for 2 minutes.`,
     );
@@ -35,7 +32,7 @@ export class VerificationService {
 
   async verifyOtp(rawPhone: string, code: string) {
     const phoneNumber = PhoneNumber.create(rawPhone);
-    const verification = await this.repository.findOne(phoneNumber.getValue, code);
+    const verification = await this.repository.findByPhoneAndCode(phoneNumber.getValue, code);
 
     if (!verification) {
       throw new BadRequestException('Invalid or expired verification code');

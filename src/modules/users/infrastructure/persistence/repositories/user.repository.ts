@@ -27,7 +27,7 @@ export class PrismaUserRepository
     });
   }
 
-  toPrisma(entity: UserEntity): any {
+  toPrisma(entity: UserEntity): Record<string, unknown> {
     return {
       phoneNumber: entity.phoneNumber,
       name: entity.name,

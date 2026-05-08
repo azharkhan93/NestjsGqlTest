@@ -6,4 +6,13 @@ export class VerificationEntity extends BaseEntity {
   expiresAt: Date;
   isUsed: boolean;
   deletedAt?: Date | null;
+
+  constructor(partial: Partial<VerificationEntity>) {
+    super();
+    Object.assign(this, partial);
+  }
+
+  static create(data: Partial<VerificationEntity>): VerificationEntity {
+    return new VerificationEntity(data);
+  }
 }

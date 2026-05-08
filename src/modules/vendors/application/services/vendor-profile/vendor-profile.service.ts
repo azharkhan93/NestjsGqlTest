@@ -1,8 +1,8 @@
-import { VendorProfileEntity } from '@modules/vendors/domain/entities';
+import { Injectable } from '@nestjs/common';
+import { assertFound } from '@common/application/helpers';
 import { IVendorProfileRepository } from '@modules/vendors/domain/repositories';
+import { VendorProfileEntity } from '@modules/vendors/domain/entities';
 import { CreateVendorProfileInput, UpdateVendorProfileInput } from '@modules/vendors/presentation/graphql/inputs';
-import { Injectable, NotFoundException } from '@nestjs/common';
-
 
 @Injectable()
 export class VendorProfileService {
@@ -13,26 +13,19 @@ export class VendorProfileService {
   }
 
   async update(id: string, input: UpdateVendorProfileInput) {
-    const profile = await this.repository.update(id, input as any);
-    if (!profile) throw new NotFoundException(`Vendor profile ${id} not found`);
-    return profile;
+    return assertFound(await this.repository.update(id, input as any), `Vendor profile ${id}`);
   }
 
   async findByUserId(userId: string) {
-    const profile = await this.repository.findByUserId(userId);
-    if (!profile) throw new NotFoundException(`Profile for user ${userId} not found`);
-    return profile;
+    return assertFound(await this.repository.findByUserId(userId), `Profile for user ${userId}`);
   }
 
   async findById(id: string) {
-    const profile = await this.repository.findOne(id);
-    if (!profile) throw new NotFoundException(`Profile ${id} not found`);
-    return profile;
+    return assertFound(await this.repository.findOne(id), `Profile ${id}`);
   }
 
   async delete(id: string) {
-    const profile = await this.repository.remove(id);
-    if (!profile) throw new NotFoundException(`Profile ${id} not found`);
+    assertFound(await this.repository.remove(id), `Profile ${id}`);
     return true;
   }
 }

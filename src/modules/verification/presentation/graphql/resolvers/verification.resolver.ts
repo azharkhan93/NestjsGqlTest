@@ -1,6 +1,6 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { VerificationService } from '../../../application/services/verification.service';
-import { SmsResponseType } from '@modules/twilio/presentation/graphql/types/sms-response.type';
+import { VerificationService } from '@modules/verification/application/services';
+import { SmsResponseType, VerifyOtpResponseType } from '../types';
 
 @Resolver()
 export class VerificationResolver {
@@ -11,7 +11,7 @@ export class VerificationResolver {
     return this.verificationService.requestOtp(phoneNumber);
   }
 
-  @Mutation(() => SmsResponseType, { name: 'verifyOtp' })
+  @Mutation(() => VerifyOtpResponseType, { name: 'verifyOtp' })
   async verifyOtp(
     @Args('phoneNumber') phoneNumber: string,
     @Args('code') code: string,

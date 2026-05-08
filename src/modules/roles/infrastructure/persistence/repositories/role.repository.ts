@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
-import { RoleEntity, UserRole } from '@modules/roles/domain/entities/role.entity';
+import { RoleEntity } from '@modules/roles/domain/entities/role.entity';
 import { Role as PrismaRole, UserRole as PrismaUserRole } from '@prisma/client';
 import { IRoleRepository } from '@modules/roles/domain/repositories/role.repository.interface';
+import { UserRole } from '@common/domain/enums';
 
 @Injectable()
 export class RoleRepository
@@ -20,18 +21,14 @@ export class RoleRepository
     return role ? this.toEntity(role) : null;
   }
 
-  async findById(id: string): Promise<RoleEntity | null> {
-    return this.findOne(id);
-  }
-
   toEntity(model: PrismaRole): RoleEntity {
-    const entity = new RoleEntity();
-    entity.id = model.id;
-    entity.name = this.toDomainRole(model.name);
-    entity.createdAt = model.createdAt;
-    entity.updatedAt = model.updatedAt;
-    entity.deletedAt = model.deletedAt;
-    return entity;
+    return RoleEntity.create({
+      id: model.id,
+      name: this.toDomainRole(model.name),
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt,
+      deletedAt: model.deletedAt,
+    });
   }
 
   toPrisma(entity: RoleEntity): Record<string, unknown> {

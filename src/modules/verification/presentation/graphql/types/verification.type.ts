@@ -14,3 +14,12 @@ export class SmsResponseType {
   @Field({ nullable: true })
   errorCode?: number;
 }
+
+@ObjectType('VerifyOtpResponse')
+export class VerifyOtpResponseType {
+  @Field()
+  success: boolean;
+
+  @Field()
+  message: string;
+}

@@ -31,7 +31,7 @@ export class VendorProfileRepository
     });
   }
 
-  toPrisma(entity: VendorProfileEntity): any {
+  toPrisma(entity: VendorProfileEntity): Record<string, unknown> {
     return {
       userId: entity.userId,
       businessName: entity.businessName,

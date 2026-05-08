@@ -57,24 +57,95 @@ model VendorProfile {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
+  bankDetails    VendorBankDetails?
+  services       Service[]
+  availability   VendorAvailability[]
+  breaks         VendorBreak[]
+  exceptions     VendorException[]
 
   @@index([userId])
   @@index([deletedAt])
   @@map("vendor_profiles")
 }
 
+model VendorAvailability {
+  id              String        @id @default(uuid())
+  vendorProfileId String        @map("vendor_profile_id")
+  vendorProfile   VendorProfile @relation(fields: [vendorProfileId], references: [id])
+  dayOfWeek       Int // 0 (Sunday) to 6 (Saturday)
+  startTime       String // HH:mm format
+  endTime         String // HH:mm format
+  isActive        Boolean       @default(true) @map("is_active")
+
+  @@unique([vendorProfileId, dayOfWeek])
+  @@map("vendor_availability")
+}
+
+model VendorBreak {
+  id              String        @id @default(uuid())
+  vendorProfileId String        @map("vendor_profile_id")
+  vendorProfile   VendorProfile @relation(fields: [vendorProfileId], references: [id])
+  name            String
+  startTime       String // HH:mm
+  endTime         String // HH:mm
+
+  @@map("vendor_breaks")
+}
+
+enum ExceptionType {
+  BLOCKED_OUT
+  SHORTENED_HOURS
+}
+
+model VendorException {
+  id              String        @id @default(uuid())
+  vendorProfileId String        @map("vendor_profile_id")
+  vendorProfile   VendorProfile @relation(fields: [vendorProfileId], references: [id])
+  date            DateTime      @db.Date
+  description     String?
+  type            ExceptionType
+  startTime       String? // Nullable if BLOCKED_OUT
+  endTime         String? // Nullable if BLOCKED_OUT
+
+  @@unique([vendorProfileId, date])
+  @@map("vendor_exceptions")
+}
+
+model VendorBankDetails {
+  id              String        @id @default(uuid())
+  vendorProfileId String        @unique @map("vendor_profile_id")
+  vendorProfile   VendorProfile @relation(fields: [vendorProfileId], references: [id])
+  accountHolder   String        @map("account_holder")
+  bankName        String        @map("bank_name")
+  ifscCode        String        @map("ifsc_code")
+  accountNumber   String        @map("account_number")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  deletedAt       DateTime?     @map("deleted_at")
+
+  @@index([vendorProfileId])
+  @@index([deletedAt])
+  @@map("vendor_bank_details")
+}
+
 
 model Service {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  price       Float
-  duration    Int // duration in minutes
-  bookings    Booking[]
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  id              String         @id @default(uuid())
+  vendorProfileId String         @map("vendor_profile_id")
+  vendorProfile   VendorProfile  @relation(fields: [vendorProfileId], references: [id])
+  name            String
+  description     String?
+  price           Float
+  duration        Int // duration in minutes
+  location        String?
+  features        String[]       @default([])
+  images          String[]       @default([])
+  bookings        Booking[]
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  deletedAt       DateTime?      @map("deleted_at")
 
+  @@index([vendorProfileId])
   @@index([deletedAt])
   @@map("services")
 }

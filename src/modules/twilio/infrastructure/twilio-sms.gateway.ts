@@ -2,11 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';
 import { PhoneNumber } from '@common/domain/value-objects/phone-number.vo';
+import { ISmsGateway } from '@modules/twilio/domain/ports';
 
 @Injectable()
-export class TwilioService {
+export class TwilioSmsGateway implements ISmsGateway {
   private readonly client: Twilio;
-  private readonly logger = new Logger(TwilioService.name);
+  private readonly logger = new Logger(TwilioSmsGateway.name);
 
   constructor(private readonly configService: ConfigService) {
     const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');

@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { RolesService } from '@modules/roles/application/services/roles.service';
 import { RoleType } from '../types/role.type';
-import { UserRole } from '@modules/roles/domain/entities/role.entity';
+import { UserRole } from '@common/domain/enums';
 
 @Resolver(() => RoleType)
 export class RolesResolver {

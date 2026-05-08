@@ -27,6 +27,11 @@ type SmsResponse {
   errorCode: Float
 }
 
+type VerifyOtpResponse {
+  success: Boolean!
+  message: String!
+}
+
 type VendorProfileType {
   id: ID!
   userId: String!
@@ -39,6 +44,66 @@ type VendorProfileType {
   operatingHours: String
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type BankDetailsType {
+  id: ID!
+  vendorProfileId: String!
+  accountHolder: String!
+  bankName: String!
+  ifscCode: String!
+  accountNumber: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type VendorService {
+  id: ID!
+  vendorProfileId: ID!
+  name: String!
+  description: String
+  price: Float!
+  duration: Int!
+  location: String
+  features: [String!]!
+  images: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type VendorSchedule {
+  id: ID!
+  dayOfWeek: Int!
+  startTime: String!
+  endTime: String!
+  isActive: Boolean!
+}
+
+type VendorBreak {
+  id: ID!
+  name: String!
+  startTime: String!
+  endTime: String!
+}
+
+type VendorException {
+  id: ID!
+  date: DateTime!
+  description: String
+  type: ExceptionType!
+  startTime: String
+  endTime: String
+}
+
+enum ExceptionType {
+  BLOCKED_OUT
+  SHORTENED_HOURS
+}
+
+type VendorAvailabilityResponse {
+  schedule: [VendorSchedule!]!
+  breaks: [VendorBreak!]!
+  exceptions: [VendorException!]!
 }
 
 type UserType {
@@ -56,6 +121,10 @@ type Query {
   roleById(id: String!): Role!
   getVendorProfile(userId: String!): VendorProfileType!
   getVendorProfileById(id: ID!): VendorProfileType!
+  getVendorBankDetails(vendorProfileId: ID!): BankDetailsType!
+  getVendorServices(vendorProfileId: ID!): [VendorService!]!
+  getVendorService(id: ID!): VendorService!
+  getVendorAvailability(vendorProfileId: ID!): VendorAvailabilityResponse!
   users: [UserType!]!
   user(id: ID!): UserType!
 }
@@ -63,10 +132,20 @@ type Query {
 type Mutation {
   createRole(name: UserRole!): Role!
   requestOtp(phoneNumber: String!): SmsResponse!
-  verifyOtp(phoneNumber: String!, code: String!): SmsResponse!
+  verifyOtp(phoneNumber: String!, code: String!): VerifyOtpResponse!
   createVendorProfile(input: CreateVendorProfileInput!): VendorProfileType!
   updateVendorProfile(id: ID!, input: UpdateVendorProfileInput!): VendorProfileType!
   deleteVendorProfile(id: ID!): Boolean!
+  upsertVendorBankDetails(vendorProfileId: ID!, input: UpsertBankDetailsInput!): BankDetailsType!
+  deleteVendorBankDetails(id: ID!): Boolean!
+  createVendorService(input: CreateVendorServiceInput!): VendorService!
+  updateVendorService(id: ID!, input: UpdateVendorServiceInput!): VendorService!
+  deleteVendorService(id: ID!): Boolean!
+  updateVendorSchedule(vendorProfileId: ID!, schedule: [UpdateScheduleInput!]!): VendorAvailabilityResponse!
+  addVendorBreak(vendorProfileId: ID!, input: CreateBreakInput!): VendorBreak!
+  removeVendorBreak(id: ID!): Boolean!
+  addVendorException(vendorProfileId: ID!, input: CreateExceptionInput!): VendorException!
+  removeVendorException(id: ID!): Boolean!
   loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): UserType!
   deleteUser(id: ID!): Boolean!
 }
@@ -90,4 +169,53 @@ input UpdateVendorProfileInput {
   address: String
   serviceRadius: String
   operatingHours: String
+}
+
+input UpsertBankDetailsInput {
+  accountHolder: String!
+  bankName: String!
+  ifscCode: String!
+  accountNumber: String!
+}
+
+input CreateVendorServiceInput {
+  vendorProfileId: ID!
+  name: String!
+  description: String
+  price: Float!
+  duration: Int!
+  location: String
+  features: [String!]! = []
+  images: [String!]! = []
+}
+
+input UpdateVendorServiceInput {
+  name: String
+  description: String
+  price: Float
+  duration: Int
+  location: String
+  features: [String!]
+  images: [String!]
+}
+
+input UpdateScheduleInput {
+  dayOfWeek: Int!
+  startTime: String!
+  endTime: String!
+  isActive: Boolean!
+}
+
+input CreateBreakInput {
+  name: String!
+  startTime: String!
+  endTime: String!
+}
+
+input CreateExceptionInput {
+  date: DateTime!
+  description: String
+  type: ExceptionType!
+  startTime: String
+  endTime: String
 }

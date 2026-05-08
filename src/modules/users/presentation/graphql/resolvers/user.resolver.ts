@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
-import { UserService } from '../../../application/services/user.service';
+import { UserService } from '@modules/users/application/services/user.service';
 import { UserType } from '../types/user.type';
-import { UserRole } from '@modules/roles/domain/entities/role.entity';
+import { UserRole } from '@common/domain/enums';
 
 @Resolver(() => UserType)
 export class UserResolver {
