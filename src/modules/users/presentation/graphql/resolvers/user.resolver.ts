@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UserService } from '@modules/users/application/services/user.service';
 import { UserType } from '../types/user.type';
 import { UserRole } from '@common/domain/enums';
+import { AuthPayloadType } from '../types/auth-payload.type';
 
 @Resolver(() => UserType)
 export class UserResolver {
@@ -17,7 +18,7 @@ export class UserResolver {
     return this.service.findById(id);
   }
 
-  @Mutation(() => UserType)
+  @Mutation(() => AuthPayloadType)
   async loginByPhone(
     @Args('phoneNumber') phoneNumber: string,
     @Args('code') code: string,

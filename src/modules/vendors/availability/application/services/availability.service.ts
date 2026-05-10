@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { IAvailabilityRepository } from '@modules/vendors/availability/domain/repositories';
-import { 
-  VendorAvailabilityEntity, 
-  VendorBreakEntity, 
-  VendorExceptionEntity 
+import {
+  VendorAvailabilityEntity,
+  VendorBreakEntity,
+  VendorExceptionEntity,
 } from '@modules/vendors/availability/domain/entities';
 
 @Injectable()
@@ -14,7 +14,10 @@ export class AvailabilityService {
     return this.repository.getVendorAvailability(vendorProfileId);
   }
 
-  async updateSchedule(vendorProfileId: string, schedule: Partial<VendorAvailabilityEntity>[]) {
+  async updateSchedule(
+    vendorProfileId: string,
+    schedule: Partial<VendorAvailabilityEntity>[],
+  ) {
     await this.repository.saveSchedule(vendorProfileId, schedule);
     return this.getAvailability(vendorProfileId);
   }
@@ -28,7 +31,10 @@ export class AvailabilityService {
     return true;
   }
 
-  async addException(vendorProfileId: string, data: Partial<VendorExceptionEntity>) {
+  async addException(
+    vendorProfileId: string,
+    data: Partial<VendorExceptionEntity>,
+  ) {
     return this.repository.addException(vendorProfileId, data);
   }
 

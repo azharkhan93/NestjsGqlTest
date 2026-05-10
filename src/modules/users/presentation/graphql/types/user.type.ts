@@ -12,6 +12,12 @@ export class UserType {
   name?: string;
 
   @Field({ nullable: true })
+  avatarUrl?: string;
+
+  @Field({ nullable: true })
+  avatarPublicId?: string;
+
+  @Field({ nullable: true })
   roleId?: string;
 
   @Field()

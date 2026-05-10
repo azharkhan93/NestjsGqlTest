@@ -115,6 +115,18 @@ type UserType {
   updatedAt: DateTime!
 }
 
+type AuthPayloadType {
+  token: String!
+  user: UserType!
+}
+
+type UploadResponseType {
+  url: String!
+  public_id: String!
+  format: String!
+  bytes: Float!
+}
+
 type Query {
   hello: String!
   roles: [Role!]!
@@ -146,8 +158,9 @@ type Mutation {
   removeVendorBreak(id: ID!): Boolean!
   addVendorException(vendorProfileId: ID!, input: CreateExceptionInput!): VendorException!
   removeVendorException(id: ID!): Boolean!
-  loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): UserType!
+  loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): AuthPayloadType!
   deleteUser(id: ID!): Boolean!
+  uploadImage(file: Upload!): UploadResponseType!
 }
 
 input CreateVendorProfileInput {
@@ -219,3 +232,6 @@ input CreateExceptionInput {
   startTime: String
   endTime: String
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload

@@ -3,6 +3,8 @@ import { BaseEntity } from '../../../../common/domain/entities/base.entity';
 export class UserEntity extends BaseEntity {
   phoneNumber: string;
   name?: string;
+  avatarUrl?: string;
+  avatarPublicId?: string;
   roleId?: string;
   deletedAt?: Date;
 
