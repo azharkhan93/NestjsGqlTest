@@ -1,12 +1,23 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, ResolveField, Parent } from '@nestjs/graphql';
 import { UserService } from '@modules/users/application/services/user.service';
+import { RolesService } from '@modules/roles/application/services/roles.service';
 import { UserType } from '../types/user.type';
+import { RoleType } from '@modules/roles/presentation/graphql/types/role.type';
 import { UserRole } from '@common/domain/enums';
 import { AuthPayloadType } from '../types/auth-payload.type';
 
 @Resolver(() => UserType)
 export class UserResolver {
-  constructor(private readonly service: UserService) {}
+  constructor(
+    private readonly service: UserService,
+    private readonly rolesService: RolesService,
+  ) {}
+
+  @ResolveField(() => RoleType, { nullable: true })
+  async role(@Parent() user: UserType) {
+    if (!user.roleId) return null;
+    return this.rolesService.findById(user.roleId);
+  }
 
   @Query(() => [UserType])
   async users() {

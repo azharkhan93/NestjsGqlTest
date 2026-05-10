@@ -18,10 +18,20 @@ export class PrismaUserRepository
     return user ? this.toEntity(user) : null;
   }
 
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    const user = await this.model.findUnique({ where: { email } });
+    return user ? this.toEntity(user) : null;
+  }
+
   toEntity(model: PrismaUser): UserEntity {
     return new UserEntity({
       ...model,
+      phoneNumber: model.phoneNumber ?? undefined,
       name: model.name ?? undefined,
+      avatarUrl: model.avatarUrl ?? undefined,
+      avatarPublicId: model.avatarPublicId ?? undefined,
+      email: model.email ?? undefined,
+      password: model.password ?? undefined,
       roleId: model.roleId ?? undefined,
       deletedAt: model.deletedAt ?? undefined,
     });
@@ -30,7 +40,11 @@ export class PrismaUserRepository
   toPrisma(entity: UserEntity): Record<string, unknown> {
     return {
       phoneNumber: entity.phoneNumber,
+      email: entity.email,
+      password: entity.password,
       name: entity.name,
+      avatarUrl: entity.avatarUrl,
+      avatarPublicId: entity.avatarPublicId,
       roleId: entity.roleId,
     };
   }

@@ -42,6 +42,7 @@ export class RoleRepository
     const mapping: Record<PrismaUserRole, UserRole> = {
       [PrismaUserRole.CUSTOMER]: UserRole.CUSTOMER,
       [PrismaUserRole.PROVIDER]: UserRole.PROVIDER,
+      [PrismaUserRole.SUPER_ADMIN]: UserRole.SUPER_ADMIN,
     };
     return mapping[role];
   }
@@ -50,6 +51,7 @@ export class RoleRepository
     const mapping: Record<UserRole, PrismaUserRole> = {
       [UserRole.CUSTOMER]: PrismaUserRole.CUSTOMER,
       [UserRole.PROVIDER]: PrismaUserRole.PROVIDER,
+      [UserRole.SUPER_ADMIN]: PrismaUserRole.SUPER_ADMIN,
     };
     return mapping[role];
   }

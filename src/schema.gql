@@ -13,6 +13,7 @@ type Role {
 enum UserRole {
   CUSTOMER
   PROVIDER
+  SUPER_ADMIN
 }
 
 """
@@ -110,7 +111,11 @@ type UserType {
   id: ID!
   phoneNumber: String!
   name: String
+  email: String
+  avatarUrl: String
+  avatarPublicId: String
   roleId: String
+  role: Role
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -127,6 +132,28 @@ type UploadResponseType {
   bytes: Float!
 }
 
+type AdminAuthPayloadType {
+  token: String!
+  user: UserType!
+}
+
+type HeroContent {
+  id: ID!
+  slide1Url: String
+  slide2Url: String
+  slide3Url: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ServiceCategory {
+  id: ID!
+  name: String!
+  icon: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   hello: String!
   roles: [Role!]!
@@ -139,6 +166,8 @@ type Query {
   getVendorAvailability(vendorProfileId: ID!): VendorAvailabilityResponse!
   users: [UserType!]!
   user(id: ID!): UserType!
+  getHeroContent: HeroContent
+  serviceCategories: [ServiceCategory!]!
 }
 
 type Mutation {
@@ -161,6 +190,14 @@ type Mutation {
   loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): AuthPayloadType!
   deleteUser(id: ID!): Boolean!
   uploadImage(file: Upload!): UploadResponseType!
+  deleteImage(publicId: String!): Boolean!
+  adminLogin(email: String!, password: String!): AdminAuthPayloadType!
+  updateHeroContent(input: UpdateHeroContentInput!): HeroContent!
+  deleteHeroContent: Boolean!
+  createServiceCategory(input: CreateServiceCategoryInput!): ServiceCategory!
+  updateServiceCategory(id: String!, input: UpdateServiceCategoryInput!): ServiceCategory!
+  deleteServiceCategory(id: String!): Boolean!
+  syncServiceCategories(categories: [SyncServiceCategoryInput!]!): [ServiceCategory!]!
 }
 
 input CreateVendorProfileInput {
@@ -235,3 +272,25 @@ input CreateExceptionInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+input UpdateHeroContentInput {
+  slide1Url: String
+  slide2Url: String
+  slide3Url: String
+}
+
+input CreateServiceCategoryInput {
+  name: String!
+  icon: String!
+}
+
+input UpdateServiceCategoryInput {
+  name: String
+  icon: String
+}
+
+input SyncServiceCategoryInput {
+  id: String
+  name: String!
+  icon: String!
+}

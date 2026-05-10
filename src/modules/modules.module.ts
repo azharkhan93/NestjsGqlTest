@@ -6,6 +6,8 @@ import { VerificationModule } from './verification/verification.module';
 import { VendorsModule } from './vendors/vendors.module';
 import { UsersModule } from './users/users.module';
 import { MediaModule } from './media/media.module';
+import { AdminModule } from './admin/admin.module';
+import { CmsModule } from './cms';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { MediaModule } from './media/media.module';
     VendorsModule,
     UsersModule,
     MediaModule,
+    AdminModule,
+    CmsModule,
   ],
 })
 export class ModulesModule {}

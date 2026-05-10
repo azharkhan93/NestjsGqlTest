@@ -11,6 +11,7 @@ datasource db {
 enum UserRole {
   CUSTOMER
   PROVIDER
+  SUPER_ADMIN
 }
 
 model Role {
@@ -27,7 +28,9 @@ model Role {
 
 model User {
   id            String         @id @default(uuid())
-  phoneNumber   String         @unique @map("phone_number")
+  phoneNumber   String?        @unique @map("phone_number")
+  email         String?        @unique
+  password      String?
   name          String?
   avatarUrl     String?        @map("avatar_url")
   avatarPublicId String?       @map("avatar_public_id")
@@ -226,4 +229,27 @@ model Verification {
   @@index([phoneNumber, code])
   @@index([deletedAt])
   @@map("verifications")
+}
+
+model HeroContent {
+  id        String   @id @default(uuid())
+  slide1Url String?  @map("slide1_url")
+  slide2Url String?  @map("slide2_url")
+  slide3Url String?  @map("slide3_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("hero_contents")
+}
+
+model ServiceCategory {
+  id        String    @id @default(uuid())
+  name      String
+  icon      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([deletedAt])
+  @@map("service_categories")
 }
