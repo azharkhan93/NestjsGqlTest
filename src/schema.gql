@@ -184,6 +184,7 @@ type Mutation {
   updateVendorService(id: ID!, input: UpdateVendorServiceInput!): VendorService!
   deleteVendorService(id: ID!): Boolean!
   updateVendorSchedule(vendorProfileId: ID!, schedule: [UpdateScheduleInput!]!): VendorAvailabilityResponse!
+  saveFullAvailability(vendorProfileId: ID!, input: SaveAvailabilityInput!): VendorAvailabilityResponse!
   addVendorBreak(vendorProfileId: ID!, input: CreateBreakInput!): VendorBreak!
   removeVendorBreak(id: ID!): Boolean!
   addVendorException(vendorProfileId: ID!, input: CreateExceptionInput!): VendorException!
@@ -255,6 +256,12 @@ input UpdateScheduleInput {
   startTime: String!
   endTime: String!
   isActive: Boolean!
+}
+
+input SaveAvailabilityInput {
+  schedule: [UpdateScheduleInput!]!
+  breaks: [CreateBreakInput!]!
+  exceptions: [CreateExceptionInput!]!
 }
 
 input CreateBreakInput {

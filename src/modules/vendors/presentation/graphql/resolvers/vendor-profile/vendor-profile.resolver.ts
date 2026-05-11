@@ -1,7 +1,10 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { VendorProfileType } from '@modules/vendors/presentation/graphql/types';
-import { CreateVendorProfileInput, UpdateVendorProfileInput } from '@modules/vendors/presentation/graphql/inputs';
+import {
+  CreateVendorProfileInput,
+  UpdateVendorProfileInput,
+} from '@modules/vendors/presentation/graphql/inputs';
 
 @Resolver(() => VendorProfileType)
 export class VendorProfileResolver {

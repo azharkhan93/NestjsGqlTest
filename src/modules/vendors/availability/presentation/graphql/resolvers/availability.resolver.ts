@@ -5,6 +5,7 @@ import {
   UpdateScheduleInput, 
   CreateBreakInput, 
   CreateExceptionInput,
+  SaveAvailabilityInput,
   VendorBreakType,
   VendorExceptionType
 } from '@modules/vendors/availability/presentation/graphql/types';
@@ -24,6 +25,14 @@ export class AvailabilityResolver {
     @Args('schedule', { type: () => [UpdateScheduleInput] }) schedule: UpdateScheduleInput[]
   ) {
     return this.service.updateSchedule(vendorProfileId, schedule);
+  }
+
+  @Mutation(() => VendorAvailabilityResponse)
+  async saveFullAvailability(
+    @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
+    @Args('input') input: SaveAvailabilityInput
+  ) {
+    return this.service.saveFullAvailability(vendorProfileId, input);
   }
 
   @Mutation(() => VendorBreakType)

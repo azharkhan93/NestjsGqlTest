@@ -60,3 +60,16 @@ export class CreateExceptionInput {
   @Field({ nullable: true }) startTime?: string;
   @Field({ nullable: true }) endTime?: string;
 }
+
+@InputType()
+export class SaveAvailabilityInput {
+  @Field(() => [UpdateScheduleInput])
+  schedule: UpdateScheduleInput[];
+
+  @Field(() => [CreateBreakInput])
+  breaks: CreateBreakInput[];
+
+  @Field(() => [CreateExceptionInput])
+  exceptions: CreateExceptionInput[];
+}
+
