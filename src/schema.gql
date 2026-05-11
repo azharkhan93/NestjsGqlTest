@@ -191,6 +191,7 @@ type Mutation {
   removeVendorException(id: ID!): Boolean!
   loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): AuthPayloadType!
   deleteUser(id: ID!): Boolean!
+  logout: Boolean!
   uploadImage(file: Upload!): UploadResponseType!
   deleteImage(publicId: String!): Boolean!
   adminLogin(email: String!, password: String!): AdminAuthPayloadType!

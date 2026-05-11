@@ -42,4 +42,9 @@ export class UserResolver {
   async deleteUser(@Args('id', { type: () => ID }) id: string) {
     return this.service.delete(id);
   }
+
+  @Mutation(() => Boolean)
+  async logout() {
+    return true;
+  }
 }

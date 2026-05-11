@@ -20,7 +20,8 @@ const PROTOCOL_MAP: Record<string, string> = {
 };
 
 const ID_TEMPLATES: Record<string, string> = {
-  mongodb: '  id    String @id @default(auto()) @map("_id") @db.ObjectId // @id:dynamic',
+  mongodb:
+    '  id    String @id @default(auto()) @map("_id") @db.ObjectId // @id:dynamic',
   default: '  id    String @id @default(uuid()) // @id:dynamic',
 };
 
@@ -35,10 +36,10 @@ function getProvider(url: string): string {
 }
 
 function updateSchema(content: string, provider: string): string {
-  // Update datasource provider
   let updated = content.replace(
     /datasource\s+db\s+{[^}]*provider\s*=\s*"[^"]*"[^}]*}/,
-    (match) => match.replace(/provider\s*=\s*"[^"]*"/, `provider = "${provider}"`)
+    (match) =>
+      match.replace(/provider\s*=\s*"[^"]*"/, `provider = "${provider}"`),
   );
 
   // Update dynamic IDs
@@ -62,7 +63,10 @@ function main() {
     fs.writeFileSync(SCHEMA_PATH, updatedSchema);
     console.log(`Successfully updated Prisma schema for: ${provider}`);
   } catch (error) {
-    console.error('Failed to update Prisma schema:', error instanceof Error ? error.message : error);
+    console.error(
+      'Failed to update Prisma schema:',
+      error instanceof Error ? error.message : error,
+    );
     process.exit(1);
   }
 }

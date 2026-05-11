@@ -13,4 +13,9 @@ export class AdminResolver {
   ) {
     return this.adminService.login(email, password);
   }
+
+  @Mutation(() => Boolean)
+  async logout() {
+    return true;
+  }
 }
