@@ -159,6 +159,7 @@ type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
   getVendorProfile(userId: String!): VendorProfileType!
+  getVendorProfiles: [VendorProfileType!]!
   getVendorProfileById(id: ID!): VendorProfileType!
   getVendorBankDetails(vendorProfileId: ID!): BankDetailsType!
   getVendorServices(vendorProfileId: ID!): [VendorService!]!

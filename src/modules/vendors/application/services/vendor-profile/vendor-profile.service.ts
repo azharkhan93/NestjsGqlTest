@@ -6,7 +6,7 @@ import { CreateVendorProfileInput, UpdateVendorProfileInput } from '@modules/ven
 
 @Injectable()
 export class VendorProfileService {
-  constructor(private readonly repository: IVendorProfileRepository) {}
+  constructor(private readonly repository: IVendorProfileRepository) { }
 
   async create(input: CreateVendorProfileInput) {
     return this.repository.create(VendorProfileEntity.create(input));
@@ -22,6 +22,10 @@ export class VendorProfileService {
 
   async findById(id: string) {
     return assertFound(await this.repository.findOne(id), `Profile ${id}`);
+  }
+
+  async findAll() {
+    return this.repository.findAll();
   }
 
   async delete(id: string) {

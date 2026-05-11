@@ -12,6 +12,11 @@ export class VendorProfileResolver {
     return this.service.findByUserId(userId);
   }
 
+  @Query(() => [VendorProfileType])
+  async getVendorProfiles() {
+    return this.service.findAll();
+  }
+
   @Query(() => VendorProfileType)
   async getVendorProfileById(@Args('id', { type: () => ID }) id: string) {
     return this.service.findById(id);
