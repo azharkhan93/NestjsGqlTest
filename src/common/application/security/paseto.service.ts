@@ -13,7 +13,7 @@ export class PasetoService {
 
   async sign(payload: any): Promise<string> {
     return V3.encrypt(payload, this.key, {
-      expiresIn: '60d',
+      expiresIn: '4d',
       iat: true,
     });
   }
