@@ -20,9 +20,15 @@ export class VerificationService {
     const code = randomInt(100000, 999999).toString();
     const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
 
-    await this.repository.save({ phoneNumber: phoneNumber.getValue, code, expiresAt });
+    await this.repository.save({
+      phoneNumber: phoneNumber.getValue,
+      code,
+      expiresAt,
+    });
 
-    this.logger.log(`OTP saved for ${phoneNumber.getValue}, expires at ${expiresAt.toISOString()}`);
+    this.logger.log(
+      `OTP saved for ${phoneNumber.getValue}, expires at ${expiresAt.toISOString()}`,
+    );
 
     return this.smsGateway.sendSms(
       phoneNumber.getValue,
@@ -32,7 +38,10 @@ export class VerificationService {
 
   async verifyOtp(rawPhone: string, code: string) {
     const phoneNumber = PhoneNumber.create(rawPhone);
-    const verification = await this.repository.findByPhoneAndCode(phoneNumber.getValue, code);
+    const verification = await this.repository.findByPhoneAndCode(
+      phoneNumber.getValue,
+      code,
+    );
 
     if (!verification) {
       throw new BadRequestException('Invalid or expired verification code');

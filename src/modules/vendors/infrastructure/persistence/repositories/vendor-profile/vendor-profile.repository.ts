@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { VendorProfileEntity } from '@modules/vendors/domain/entities';
 import { VendorProfile as PrismaVendorProfile } from '@prisma/client';
 import { IVendorProfileRepository } from '@modules/vendors/domain/repositories';

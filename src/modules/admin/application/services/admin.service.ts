@@ -1,4 +1,8 @@
-import { Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { IUserRepository } from '@modules/users/domain/repositories/user.repository.interface';
 import { RolesService } from '@modules/roles/application/services/roles.service';
@@ -31,12 +35,14 @@ export class AdminService implements OnModuleInit {
       const role = await this.rolesService.create(UserRole.SUPER_ADMIN);
       const hashedPassword = await bcrypt.hash('admin123', 10);
 
-      await this.userRepository.create(UserEntity.create({
-        email: adminEmail,
-        password: hashedPassword,
-        roleId: role.id,
-        name: 'Super Admin',
-      }));
+      await this.userRepository.create(
+        UserEntity.create({
+          email: adminEmail,
+          password: hashedPassword,
+          roleId: role.id,
+          name: 'Super Admin',
+        }),
+      );
 
       console.log('🚀 Super Admin seeded successfully');
     } catch (error) {
@@ -44,9 +50,12 @@ export class AdminService implements OnModuleInit {
     }
   }
 
-  async login(email: string, password: string): Promise<{ token: string; user: UserEntity }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ token: string; user: UserEntity }> {
     const user = await this.userRepository.findByEmail(email);
-    
+
     if (!user || !user.password) {
       throw new UnauthorizedException('Invalid credentials');
     }

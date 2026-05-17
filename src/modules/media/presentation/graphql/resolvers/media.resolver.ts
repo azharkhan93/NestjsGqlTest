@@ -13,8 +13,7 @@ export class MediaResolver {
     file: FileUpload,
   ): Promise<UploadResponseType> {
     const { createReadStream, filename, mimetype } = file;
-    
-    
+
     const chunks: Buffer[] = [];
     for await (const chunk of createReadStream()) {
       chunks.push(Buffer.from(chunk));

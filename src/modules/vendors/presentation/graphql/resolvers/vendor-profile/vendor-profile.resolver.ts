@@ -1,12 +1,16 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { VendorProfileType } from '@modules/vendors/presentation/graphql/types';
+import { GqlAuthGuard } from '@common/presentation/guards/index';
+import { CurrentUser } from '@common/presentation/decorators/index';
 import {
   CreateVendorProfileInput,
   UpdateVendorProfileInput,
 } from '@modules/vendors/presentation/graphql/inputs';
 
 @Resolver(() => VendorProfileType)
+@UseGuards(GqlAuthGuard)
 export class VendorProfileResolver {
   constructor(private readonly service: VendorProfileService) {}
 
@@ -26,7 +30,12 @@ export class VendorProfileResolver {
   }
 
   @Mutation(() => VendorProfileType)
-  async createVendorProfile(@Args('input') input: CreateVendorProfileInput) {
+  async createVendorProfile(
+    @Args('input') input: CreateVendorProfileInput,
+    @CurrentUser() user: any,
+  ) {
+    // Super admin can provide an explicit userId; otherwise default to caller's own id
+    input.userId = input.userId || user.sub;
     return this.service.create(input);
   }
 

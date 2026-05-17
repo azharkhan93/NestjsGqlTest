@@ -74,6 +74,21 @@ export class AvailabilityRepository implements IAvailabilityRepository {
     );
   }
 
+  async updateScheduleItem(
+    id: string,
+    data: Partial<VendorAvailabilityEntity>,
+  ) {
+    const result = await this.prisma.vendorAvailability.update({
+      where: { id },
+      data: {
+        startTime: data.startTime,
+        endTime: data.endTime,
+        isActive: data.isActive,
+      },
+    });
+    return new VendorAvailabilityEntity(result);
+  }
+
   async syncBreaks(
     vendorProfileId: string,
     breaks: Partial<VendorBreakEntity>[],
@@ -126,6 +141,18 @@ export class AvailabilityRepository implements IAvailabilityRepository {
     return new VendorBreakEntity(result);
   }
 
+  async updateBreak(id: string, data: Partial<VendorBreakEntity>) {
+    const result = await this.prisma.vendorBreak.update({
+      where: { id },
+      data: {
+        name: data.name,
+        startTime: data.startTime,
+        endTime: data.endTime,
+      },
+    });
+    return new VendorBreakEntity(result);
+  }
+
   async removeBreak(id: string) {
     await this.prisma.vendorBreak.delete({ where: { id } });
   }
@@ -140,6 +167,23 @@ export class AvailabilityRepository implements IAvailabilityRepository {
         date: data.date!,
         description: data.description,
         type: data.type!,
+        startTime: data.startTime,
+        endTime: data.endTime,
+      },
+    });
+    return new VendorExceptionEntity({
+      ...result,
+      type: result.type as ExceptionType,
+    });
+  }
+
+  async updateException(id: string, data: Partial<VendorExceptionEntity>) {
+    const result = await this.prisma.vendorException.update({
+      where: { id },
+      data: {
+        date: data.date ? new Date(data.date) : undefined,
+        description: data.description,
+        type: data.type,
         startTime: data.startTime,
         endTime: data.endTime,
       },

@@ -28,7 +28,9 @@ export class PhoneNumber extends ValueObject<PhoneNumberProps> {
   private static validate(value: string): void {
     const e164Regex = /^\+[1-9]\d{1,14}$/;
     if (!e164Regex.test(value)) {
-      throw new BadRequestException(`Invalid phone number format: ${value}. Must be E.164.`);
+      throw new BadRequestException(
+        `Invalid phone number format: ${value}. Must be E.164.`,
+      );
     }
   }
 }

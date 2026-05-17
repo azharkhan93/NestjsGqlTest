@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { PasetoService } from './application/security/paseto.service';
 import { FileValidatorService } from './application/security/file-validator';

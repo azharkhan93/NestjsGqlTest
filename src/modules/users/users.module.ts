@@ -8,11 +8,7 @@ import { VerificationModule } from '@modules/verification/verification.module';
 import { RolesModule } from '@modules/roles/roles.module';
 
 @Module({
-  imports: [
-    CommonModule,
-    VerificationModule,
-    RolesModule
-  ],
+  imports: [CommonModule, VerificationModule, RolesModule],
   providers: [
     UserService,
     UserResolver,

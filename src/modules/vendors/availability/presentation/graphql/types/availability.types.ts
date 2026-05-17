@@ -1,4 +1,11 @@
-import { Field, ID, Int, ObjectType, registerEnumType, InputType } from '@nestjs/graphql';
+import {
+  Field,
+  ID,
+  Int,
+  ObjectType,
+  registerEnumType,
+  InputType,
+} from '@nestjs/graphql';
 import { ExceptionType } from '@modules/vendors/availability/domain/entities';
 
 registerEnumType(ExceptionType, { name: 'ExceptionType' });
@@ -62,6 +69,22 @@ export class CreateExceptionInput {
 }
 
 @InputType()
+export class UpdateBreakInput {
+  @Field({ nullable: true }) name?: string;
+  @Field({ nullable: true }) startTime?: string;
+  @Field({ nullable: true }) endTime?: string;
+}
+
+@InputType()
+export class UpdateExceptionInput {
+  @Field({ nullable: true }) date?: Date;
+  @Field({ nullable: true }) description?: string;
+  @Field(() => ExceptionType, { nullable: true }) type?: ExceptionType;
+  @Field({ nullable: true }) startTime?: string;
+  @Field({ nullable: true }) endTime?: string;
+}
+
+@InputType()
 export class SaveAvailabilityInput {
   @Field(() => [UpdateScheduleInput])
   schedule: UpdateScheduleInput[];
@@ -72,4 +95,3 @@ export class SaveAvailabilityInput {
   @Field(() => [CreateExceptionInput])
   exceptions: CreateExceptionInput[];
 }
-

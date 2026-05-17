@@ -10,7 +10,9 @@ export class HeroContentService {
     return this.repository.findFirst();
   }
 
-  async updateHeroContent(data: Partial<HeroContentEntity>): Promise<HeroContentEntity> {
+  async updateHeroContent(
+    data: Partial<HeroContentEntity>,
+  ): Promise<HeroContentEntity> {
     return this.repository.updateOrCreate(data);
   }
 

@@ -17,7 +17,10 @@ export class RolesService {
   }
 
   async findByName(name: UserRole): Promise<RoleEntity> {
-    return assertFound(await this.roleRepository.findByName(name), `Role ${name}`);
+    return assertFound(
+      await this.roleRepository.findByName(name),
+      `Role ${name}`,
+    );
   }
 
   async create(name: UserRole): Promise<RoleEntity> {

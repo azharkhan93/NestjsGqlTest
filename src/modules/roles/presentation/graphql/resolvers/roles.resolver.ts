@@ -18,7 +18,9 @@ export class RolesResolver {
   }
 
   @Mutation(() => RoleType)
-  async createRole(@Args('name', { type: () => UserRole }) name: UserRole): Promise<RoleType> {
+  async createRole(
+    @Args('name', { type: () => UserRole }) name: UserRole,
+  ): Promise<RoleType> {
     return this.rolesService.create(name);
   }
 }

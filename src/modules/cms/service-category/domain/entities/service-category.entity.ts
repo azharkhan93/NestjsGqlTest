@@ -1,4 +1,4 @@
-import { BaseEntity } from "@common/domain/entities";
+import { BaseEntity } from '@common/domain/entities';
 
 export class ServiceCategoryEntity extends BaseEntity {
   name: string;

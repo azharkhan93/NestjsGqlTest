@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { assertFound } from '@common/application/helpers';
 import { IVendorServiceRepository } from '@modules/vendors/vendor-services/domain/repositories';
 import { VendorServiceEntity } from '@modules/vendors/vendor-services/domain/entities';
-import { CreateVendorServiceInput, UpdateVendorServiceInput } from '@modules/vendors/vendor-services/presentation/graphql/inputs';
+import {
+  CreateVendorServiceInput,
+  UpdateVendorServiceInput,
+} from '@modules/vendors/vendor-services/presentation/graphql/inputs';
 
 @Injectable()
 export class VendorServiceService {
@@ -12,12 +15,17 @@ export class VendorServiceService {
     return this.repository.create(VendorServiceEntity.create(input));
   }
 
-  async update(id: string, input: UpdateVendorServiceInput): Promise<VendorServiceEntity> {
+  async update(
+    id: string,
+    input: UpdateVendorServiceInput,
+  ): Promise<VendorServiceEntity> {
     const service = await this.repository.update(id, input as any);
     return assertFound(service, `Vendor Service ${id}`);
   }
 
-  async findAllByVendor(vendorProfileId: string): Promise<VendorServiceEntity[]> {
+  async findAllByVendor(
+    vendorProfileId: string,
+  ): Promise<VendorServiceEntity[]> {
     return this.repository.findByVendorProfileId(vendorProfileId);
   }
 

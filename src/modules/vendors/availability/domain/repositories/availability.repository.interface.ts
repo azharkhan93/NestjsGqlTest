@@ -16,6 +16,10 @@ export abstract class IAvailabilityRepository {
     schedule: Partial<VendorAvailabilityEntity>[],
     tx?: any,
   ): Promise<void>;
+  abstract updateScheduleItem(
+    id: string,
+    data: Partial<VendorAvailabilityEntity>,
+  ): Promise<VendorAvailabilityEntity>;
   abstract syncBreaks(
     vendorProfileId: string,
     breaks: Partial<VendorBreakEntity>[],
@@ -31,9 +35,17 @@ export abstract class IAvailabilityRepository {
     vendorProfileId: string,
     data: Partial<VendorBreakEntity>,
   ): Promise<VendorBreakEntity>;
+  abstract updateBreak(
+    id: string,
+    data: Partial<VendorBreakEntity>,
+  ): Promise<VendorBreakEntity>;
   abstract removeBreak(id: string): Promise<void>;
   abstract addException(
     vendorProfileId: string,
+    data: Partial<VendorExceptionEntity>,
+  ): Promise<VendorExceptionEntity>;
+  abstract updateException(
+    id: string,
     data: Partial<VendorExceptionEntity>,
   ): Promise<VendorExceptionEntity>;
   abstract removeException(id: string): Promise<void>;

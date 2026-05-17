@@ -7,7 +7,7 @@ export class PasetoService {
   private readonly key: Buffer;
 
   constructor() {
-    const secret = process.env.PASETO_SECRET || 'fallback-secret-for-development-only-needs-to-be-secure';
+    const secret = process.env.PASETO_SECRET || 'xyzsecretkey';
     this.key = crypto.createHash('sha256').update(secret).digest();
   }
 
@@ -21,7 +21,7 @@ export class PasetoService {
   async verify(token: string): Promise<any> {
     try {
       return await V3.decrypt(token, this.key);
-    } catch (error) {
+    } catch {
       return null;
     }
   }

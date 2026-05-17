@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { BankDetailsEntity } from '@modules/vendors/bank-details/domain/entities';
 import { IBankDetailsRepository } from '@modules/vendors/bank-details/domain/repositories';
 import { VendorBankDetails as PrismaVendorBankDetails } from '@prisma/client';
@@ -13,12 +16,17 @@ export class BankDetailsRepository
     super(prisma, 'vendorBankDetails');
   }
 
-  async findByVendorProfileId(vendorProfileId: string): Promise<BankDetailsEntity | null> {
+  async findByVendorProfileId(
+    vendorProfileId: string,
+  ): Promise<BankDetailsEntity | null> {
     const result = await this.model.findUnique({ where: { vendorProfileId } });
     return result ? this.toEntity(result) : null;
   }
 
-  async upsert(vendorProfileId: string, data: Partial<BankDetailsEntity>): Promise<BankDetailsEntity> {
+  async upsert(
+    vendorProfileId: string,
+    data: Partial<BankDetailsEntity>,
+  ): Promise<BankDetailsEntity> {
     const result = await this.model.upsert({
       where: { vendorProfileId },
       update: {

@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { VendorServiceEntity } from '@modules/vendors/vendor-services/domain/entities';
 import { IVendorServiceRepository } from '@modules/vendors/vendor-services/domain/repositories';
 import { Service as PrismaServiceType } from '@prisma/client';
@@ -13,11 +16,13 @@ export class VendorServiceRepository
     super(prisma, 'service');
   }
 
-  async findByVendorProfileId(vendorProfileId: string): Promise<VendorServiceEntity[]> {
+  async findByVendorProfileId(
+    vendorProfileId: string,
+  ): Promise<VendorServiceEntity[]> {
     const services = await this.model.findMany({
       where: { vendorProfileId, deletedAt: null },
     });
-    return services.map(s => this.toEntity(s));
+    return services.map((s) => this.toEntity(s));
   }
 
   toEntity(model: PrismaServiceType): VendorServiceEntity {

@@ -8,11 +8,16 @@ import { UpsertBankDetailsInput } from '@modules/vendors/bank-details/presentati
 export class BankDetailsService {
   constructor(private readonly repository: IBankDetailsRepository) {}
 
-  async upsert(vendorProfileId: string, input: UpsertBankDetailsInput): Promise<BankDetailsEntity> {
+  async upsert(
+    vendorProfileId: string,
+    input: UpsertBankDetailsInput,
+  ): Promise<BankDetailsEntity> {
     return this.repository.upsert(vendorProfileId, input);
   }
 
-  async findByVendorProfileId(vendorProfileId: string): Promise<BankDetailsEntity> {
+  async findByVendorProfileId(
+    vendorProfileId: string,
+  ): Promise<BankDetailsEntity> {
     return assertFound(
       await this.repository.findByVendorProfileId(vendorProfileId),
       `Bank details for vendor ${vendorProfileId}`,

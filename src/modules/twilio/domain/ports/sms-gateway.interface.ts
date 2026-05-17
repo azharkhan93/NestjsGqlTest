@@ -5,5 +5,10 @@ export abstract class ISmsGateway {
   abstract sendSms(
     to: string,
     message: string,
-  ): Promise<{ success: boolean; sid?: string; message: string; errorCode?: number }>;
+  ): Promise<{
+    success: boolean;
+    sid?: string;
+    message: string;
+    errorCode?: number;
+  }>;
 }

@@ -18,8 +18,15 @@ export class UserService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async loginByPhone(phoneNumber: string, code: string, roleName: UserRole): Promise<{ token: string; user: UserEntity }> {
-    const isVerified = await this.verificationService.verifyOtp(phoneNumber, code);
+  async loginByPhone(
+    phoneNumber: string,
+    code: string,
+    roleName: UserRole,
+  ): Promise<{ token: string; user: UserEntity }> {
+    const isVerified = await this.verificationService.verifyOtp(
+      phoneNumber,
+      code,
+    );
     if (!isVerified.success) {
       throw new BadRequestException('Invalid or expired OTP');
     }
@@ -28,10 +35,12 @@ export class UserService {
 
     if (!user) {
       const role = await this.rolesService.findByName(roleName);
-      user = await this.repository.create(UserEntity.create({
-        phoneNumber,
-        roleId: role.id,
-      }));
+      user = await this.repository.create(
+        UserEntity.create({
+          phoneNumber,
+          roleId: role.id,
+        }),
+      );
     }
 
     const token = await this.pasetoService.sign({
@@ -52,7 +61,7 @@ export class UserService {
 
   async delete(id: string): Promise<boolean> {
     const user = await this.findById(id);
-    
+
     // 1. Delete avatar from Cloudinary if exists
     if (user.avatarPublicId) {
       await this.cloudinaryService.deleteFile(user.avatarPublicId);
@@ -63,4 +72,3 @@ export class UserService {
     return true;
   }
 }
-

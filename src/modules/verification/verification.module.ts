@@ -14,7 +14,10 @@ import { OtpCleanupService } from './infrastructure/services/otp-cleanup.service
     VerificationService,
     VerificationResolver,
     OtpCleanupService,
-    { provide: IVerificationRepository, useClass: PrismaVerificationRepository },
+    {
+      provide: IVerificationRepository,
+      useClass: PrismaVerificationRepository,
+    },
   ],
   exports: [VerificationService],
 })

@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { HeroContentEntity } from '@modules/cms/hero-content/domain/entities';
 import { HeroContent as PrismaHeroContent } from '@prisma/client';
 import { IHeroContentRepository } from '@modules/cms/hero-content/domain/repositories';
@@ -18,9 +21,11 @@ export class PrismaHeroContentRepository
     return content ? this.toEntity(content) : null;
   }
 
-  async updateOrCreate(data: Partial<HeroContentEntity>): Promise<HeroContentEntity> {
+  async updateOrCreate(
+    data: Partial<HeroContentEntity>,
+  ): Promise<HeroContentEntity> {
     const existing = await this.model.findFirst();
-    
+
     let result: PrismaHeroContent;
     if (existing) {
       result = await this.model.update({
@@ -40,7 +45,7 @@ export class PrismaHeroContentRepository
         },
       });
     }
-    
+
     return this.toEntity(result);
   }
 

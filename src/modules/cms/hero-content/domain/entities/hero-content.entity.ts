@@ -1,4 +1,4 @@
-import { BaseEntity } from "@common/domain/entities/base.entity";
+import { BaseEntity } from '@common/domain/entities/base.entity';
 
 export class HeroContentEntity extends BaseEntity {
   slide1Url?: string;

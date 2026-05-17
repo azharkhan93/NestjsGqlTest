@@ -14,7 +14,9 @@ export class TwilioSmsGateway implements ISmsGateway {
     const authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN');
 
     if (!accountSid || !authToken) {
-      this.logger.error('Twilio credentials not found in environment variables');
+      this.logger.error(
+        'Twilio credentials not found in environment variables',
+      );
     }
 
     this.client = new Twilio(accountSid, authToken);

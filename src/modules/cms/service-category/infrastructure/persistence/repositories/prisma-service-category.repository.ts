@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { ServiceCategoryEntity } from '@modules/cms/service-category/domain/entities';
 import { ServiceCategory as PrismaServiceCategory } from '@prisma/client';
 import { IServiceCategoryRepository } from '@modules/cms/service-category/domain/repositories';
@@ -13,13 +16,17 @@ export class PrismaServiceCategoryRepository
     super(prisma, 'serviceCategory');
   }
 
-  async createBulk(categories: ServiceCategoryEntity[]): Promise<ServiceCategoryEntity[]> {
+  async createBulk(
+    categories: ServiceCategoryEntity[],
+  ): Promise<ServiceCategoryEntity[]> {
     const data = categories.map((cat) => this.toPrisma(cat));
     await this.model.createMany({ data });
     return this.findAll();
   }
 
-  async syncBulk(categories: Partial<ServiceCategoryEntity>[]): Promise<ServiceCategoryEntity[]> {
+  async syncBulk(
+    categories: Partial<ServiceCategoryEntity>[],
+  ): Promise<ServiceCategoryEntity[]> {
     return await this.prisma.$transaction(async (tx) => {
       const activeIds = categories.filter((c) => c.id).map((c) => c.id!);
 

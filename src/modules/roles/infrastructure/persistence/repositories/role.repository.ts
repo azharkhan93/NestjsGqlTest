@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { RoleEntity } from '@modules/roles/domain/entities/role.entity';
 import { Role as PrismaRole, UserRole as PrismaUserRole } from '@prisma/client';
 import { IRoleRepository } from '@modules/roles/domain/repositories/role.repository.interface';

@@ -1,63 +1,113 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { AvailabilityService } from '@modules/vendors/availability/application/services';
-import { 
-  VendorAvailabilityResponse, 
-  UpdateScheduleInput, 
-  CreateBreakInput, 
+import { GqlAuthGuard, RolesGuard } from '@common/presentation/guards/index';
+import { Roles, CurrentUser } from '@common/presentation/decorators/index';
+import { UserRole } from '@common/domain/enums';
+import {
+  VendorAvailabilityResponse,
+  VendorScheduleType,
+  UpdateScheduleInput,
+  CreateBreakInput,
   CreateExceptionInput,
   SaveAvailabilityInput,
   VendorBreakType,
-  VendorExceptionType
+  VendorExceptionType,
+  UpdateBreakInput,
+  UpdateExceptionInput,
 } from '@modules/vendors/availability/presentation/graphql/types';
 
 @Resolver()
+@UseGuards(GqlAuthGuard, RolesGuard)
+@Roles(UserRole.SUPER_ADMIN, UserRole.PROVIDER)
 export class AvailabilityResolver {
   constructor(private readonly service: AvailabilityService) {}
 
   @Query(() => VendorAvailabilityResponse)
-  async getVendorAvailability(@Args('vendorProfileId', { type: () => ID }) vendorProfileId: string) {
-    return this.service.getAvailability(vendorProfileId);
+  async getVendorAvailability(
+    @CurrentUser() user: any,
+    @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
+  ) {
+    return this.service.getAvailability(user, vendorProfileId);
   }
 
   @Mutation(() => VendorAvailabilityResponse)
   async updateVendorSchedule(
+    @CurrentUser() user: any,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
-    @Args('schedule', { type: () => [UpdateScheduleInput] }) schedule: UpdateScheduleInput[]
+    @Args('schedule', { type: () => [UpdateScheduleInput] })
+    schedule: UpdateScheduleInput[],
   ) {
-    return this.service.updateSchedule(vendorProfileId, schedule);
+    return this.service.updateSchedule(user, vendorProfileId, schedule);
+  }
+
+  @Mutation(() => VendorScheduleType)
+  async updateVendorScheduleItem(
+    @CurrentUser() user: any,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateScheduleInput,
+  ) {
+    return this.service.updateScheduleItem(user, id, input);
   }
 
   @Mutation(() => VendorAvailabilityResponse)
   async saveFullAvailability(
+    @CurrentUser() user: any,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
-    @Args('input') input: SaveAvailabilityInput
+    @Args('input') input: SaveAvailabilityInput,
   ) {
-    return this.service.saveFullAvailability(vendorProfileId, input);
+    return this.service.saveFullAvailability(user, vendorProfileId, input);
   }
 
   @Mutation(() => VendorBreakType)
   async addVendorBreak(
+    @CurrentUser() user: any,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
-    @Args('input') input: CreateBreakInput
+    @Args('input') input: CreateBreakInput,
   ) {
-    return this.service.addBreak(vendorProfileId, input);
+    return this.service.addBreak(user, vendorProfileId, input);
+  }
+
+  @Mutation(() => VendorBreakType)
+  async updateVendorBreak(
+    @CurrentUser() user: any,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateBreakInput,
+  ) {
+    return this.service.updateBreak(user, id, input);
   }
 
   @Mutation(() => Boolean)
-  async removeVendorBreak(@Args('id', { type: () => ID }) id: string) {
-    return this.service.removeBreak(id);
+  async removeVendorBreak(
+    @CurrentUser() user: any,
+    @Args('id', { type: () => ID }) id: string,
+  ) {
+    return this.service.removeBreak(user, id);
   }
 
   @Mutation(() => VendorExceptionType)
   async addVendorException(
+    @CurrentUser() user: any,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
-    @Args('input') input: CreateExceptionInput
+    @Args('input') input: CreateExceptionInput,
   ) {
-    return this.service.addException(vendorProfileId, input);
+    return this.service.addException(user, vendorProfileId, input);
+  }
+
+  @Mutation(() => VendorExceptionType)
+  async updateVendorException(
+    @CurrentUser() user: any,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateExceptionInput,
+  ) {
+    return this.service.updateException(user, id, input);
   }
 
   @Mutation(() => Boolean)
-  async removeVendorException(@Args('id', { type: () => ID }) id: string) {
-    return this.service.removeException(id);
+  async removeVendorException(
+    @CurrentUser() user: any,
+    @Args('id', { type: () => ID }) id: string,
+  ) {
+    return this.service.removeException(user, id);
   }
 }

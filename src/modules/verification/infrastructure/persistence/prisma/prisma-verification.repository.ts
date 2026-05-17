@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository, PrismaService } from '@common/infrastructure/persistence';
+import {
+  PrismaRepository,
+  PrismaService,
+} from '@common/infrastructure/persistence';
 import { IVerificationRepository } from '@modules/verification/domain/repositories/verification.repository.interface';
 import { VerificationEntity } from '@modules/verification/domain/entities/verification.entity';
 import { Verification as PrismaVerification } from '@prisma/client';
@@ -13,11 +16,18 @@ export class PrismaVerificationRepository
     super(prisma, 'verification');
   }
 
-  async save(data: { phoneNumber: string; code: string; expiresAt: Date }): Promise<void> {
+  async save(data: {
+    phoneNumber: string;
+    code: string;
+    expiresAt: Date;
+  }): Promise<void> {
     await this.model.create({ data });
   }
 
-  async findByPhoneAndCode(phoneNumber: string, code: string): Promise<VerificationEntity | null> {
+  async findByPhoneAndCode(
+    phoneNumber: string,
+    code: string,
+  ): Promise<VerificationEntity | null> {
     const record = await this.model.findFirst({
       where: {
         phoneNumber,

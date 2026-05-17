@@ -133,7 +133,6 @@ type UploadResponseType {
 }
 
 type AdminAuthPayloadType {
-  token: String!
   user: UserType!
 }
 
@@ -155,7 +154,6 @@ type ServiceCategory {
 }
 
 type Query {
-  hello: String!
   roles: [Role!]!
   roleById(id: String!): Role!
   getVendorProfile(userId: String!): VendorProfileType!
@@ -184,10 +182,13 @@ type Mutation {
   updateVendorService(id: ID!, input: UpdateVendorServiceInput!): VendorService!
   deleteVendorService(id: ID!): Boolean!
   updateVendorSchedule(vendorProfileId: ID!, schedule: [UpdateScheduleInput!]!): VendorAvailabilityResponse!
+  updateVendorScheduleItem(id: ID!, input: UpdateScheduleInput!): VendorSchedule!
   saveFullAvailability(vendorProfileId: ID!, input: SaveAvailabilityInput!): VendorAvailabilityResponse!
   addVendorBreak(vendorProfileId: ID!, input: CreateBreakInput!): VendorBreak!
+  updateVendorBreak(id: ID!, input: UpdateBreakInput!): VendorBreak!
   removeVendorBreak(id: ID!): Boolean!
   addVendorException(vendorProfileId: ID!, input: CreateExceptionInput!): VendorException!
+  updateVendorException(id: ID!, input: UpdateExceptionInput!): VendorException!
   removeVendorException(id: ID!): Boolean!
   loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): AuthPayloadType!
   deleteUser(id: ID!): Boolean!
@@ -204,7 +205,7 @@ type Mutation {
 }
 
 input CreateVendorProfileInput {
-  userId: String!
+  userId: String
   businessName: String!
   imageUri: String
   gstNumber: String
@@ -275,6 +276,20 @@ input CreateExceptionInput {
   date: DateTime!
   description: String
   type: ExceptionType!
+  startTime: String
+  endTime: String
+}
+
+input UpdateBreakInput {
+  name: String
+  startTime: String
+  endTime: String
+}
+
+input UpdateExceptionInput {
+  date: DateTime
+  description: String
+  type: ExceptionType
   startTime: String
   endTime: String
 }

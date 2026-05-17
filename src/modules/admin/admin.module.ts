@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { CommonModule } from '@common/common.module';
-import { UsersModule } from '@modules/users/users.module';
 import { RolesModule } from '@modules/roles/roles.module';
 import { AdminService } from './application/services/admin.service';
 import { AdminResolver } from './presentation/graphql/resolvers/admin.resolver';
@@ -12,7 +11,7 @@ import { PrismaUserRepository } from '@modules/users/infrastructure/persistence/
   providers: [
     AdminService,
     AdminResolver,
-  
+
     {
       provide: IUserRepository,
       useClass: PrismaUserRepository,

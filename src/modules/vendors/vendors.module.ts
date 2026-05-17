@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { CommonModule } from '@common/common.module';
 import { VendorProfileService } from './application/services/vendor-profile/vendor-profile.service';
