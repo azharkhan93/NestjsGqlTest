@@ -1,4 +1,5 @@
 import { BaseEntity } from '@common/domain/entities';
+import { ServiceCategoryEntity } from '@modules/cms/service-category/domain/entities/service-category.entity';
 
 export class VendorProfileEntity extends BaseEntity {
   userId: string;
@@ -9,6 +10,11 @@ export class VendorProfileEntity extends BaseEntity {
   address?: string;
   serviceRadius?: string;
   operatingHours?: string;
+  description?: string;
+  whyChooseMe?: string;
+  images?: string[];
+  categoryIds?: string[];
+  categories?: ServiceCategoryEntity[];
   deletedAt?: Date;
 
   constructor(partial: Partial<VendorProfileEntity>) {

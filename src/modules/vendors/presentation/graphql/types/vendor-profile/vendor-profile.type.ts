@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ServiceCategory } from '@modules/cms/service-category/presentation/graphql/types/service-category.type';
 
 @ObjectType()
 export class VendorProfileType {
@@ -28,6 +29,18 @@ export class VendorProfileType {
 
   @Field({ nullable: true })
   operatingHours?: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  whyChooseMe?: string;
+
+  @Field(() => [String], { defaultValue: [] })
+  images: string[];
+
+  @Field(() => [ServiceCategory], { defaultValue: [] })
+  categories: ServiceCategory[];
 
   @Field()
   createdAt: Date;

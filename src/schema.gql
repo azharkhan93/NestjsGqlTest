@@ -33,6 +33,14 @@ type VerifyOtpResponse {
   message: String!
 }
 
+type ServiceCategory {
+  id: ID!
+  name: String!
+  icon: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type VendorProfileType {
   id: ID!
   userId: String!
@@ -43,6 +51,10 @@ type VendorProfileType {
   address: String
   serviceRadius: String
   operatingHours: String
+  description: String
+  whyChooseMe: String
+  images: [String!]!
+  categories: [ServiceCategory!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -145,14 +157,6 @@ type HeroContent {
   updatedAt: DateTime!
 }
 
-type ServiceCategory {
-  id: ID!
-  name: String!
-  icon: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type CustomerAddressType {
   id: ID!
   customerProfileId: String!
@@ -245,6 +249,10 @@ input CreateVendorProfileInput {
   address: String
   serviceRadius: String
   operatingHours: String
+  description: String
+  whyChooseMe: String
+  images: [String!]
+  categoryIds: [String!]
 }
 
 input UpdateVendorProfileInput {
@@ -255,6 +263,10 @@ input UpdateVendorProfileInput {
   address: String
   serviceRadius: String
   operatingHours: String
+  description: String
+  whyChooseMe: String
+  images: [String!]
+  categoryIds: [String!]
 }
 
 input UpsertBankDetailsInput {

@@ -60,6 +60,10 @@ model VendorProfile {
   address        String?
   serviceRadius  String?   @map("service_radius") // e.g. "5km", "10km", "25km"
   operatingHours String?   @map("operating_hours")
+  description    String?
+  whyChooseMe    String?   @map("why_choose_me")
+  images         String[]  @default([])
+  categories     ServiceCategory[]
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
@@ -247,6 +251,7 @@ model ServiceCategory {
   id        String    @id @default(uuid())
   name      String
   icon      String
+  vendors   VendorProfile[]
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")

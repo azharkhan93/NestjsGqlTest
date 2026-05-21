@@ -25,6 +25,18 @@ export class CreateVendorProfileInput {
 
   @Field({ nullable: true })
   operatingHours?: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  whyChooseMe?: string;
+
+  @Field(() => [String], { nullable: true })
+  images?: string[];
+
+  @Field(() => [String], { nullable: true })
+  categoryIds?: string[];
 }
 
 @InputType()
@@ -49,4 +61,16 @@ export class UpdateVendorProfileInput {
 
   @Field({ nullable: true })
   operatingHours?: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  whyChooseMe?: string;
+
+  @Field(() => [String], { nullable: true })
+  images?: string[];
+
+  @Field(() => [String], { nullable: true })
+  categoryIds?: string[];
 }
