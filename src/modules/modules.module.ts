@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { MediaModule } from './media/media.module';
 import { AdminModule } from './admin/admin.module';
 import { CmsModule } from './cms';
+import { CustomersModule } from './customers/customers.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CmsModule } from './cms';
     MediaModule,
     AdminModule,
     CmsModule,
+    CustomersModule,
   ],
 })
 export class ModulesModule {}

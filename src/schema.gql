@@ -153,6 +153,31 @@ type ServiceCategory {
   updatedAt: DateTime!
 }
 
+type CustomerAddressType {
+  id: ID!
+  customerProfileId: String!
+  label: String!
+  street: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  type: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CustomerProfileType {
+  id: ID!
+  userId: String!
+  name: String!
+  phone: String!
+  email: String
+  location: String
+  addresses: [CustomerAddressType]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
@@ -167,6 +192,8 @@ type Query {
   user(id: ID!): UserType!
   getHeroContent: HeroContent
   serviceCategories: [ServiceCategory!]!
+  getCustomerProfile(userId: String!): CustomerProfileType
+  getCustomerAddresses(customerProfileId: ID!): [CustomerAddressType!]!
 }
 
 type Mutation {
@@ -202,6 +229,11 @@ type Mutation {
   updateServiceCategory(id: String!, input: UpdateServiceCategoryInput!): ServiceCategory!
   deleteServiceCategory(id: String!): Boolean!
   syncServiceCategories(categories: [SyncServiceCategoryInput!]!): [ServiceCategory!]!
+  upsertCustomerProfile(input: UpsertCustomerProfileInput!): CustomerProfileType!
+  deleteCustomerProfile(id: ID!): Boolean!
+  createCustomerAddress(customerProfileId: ID!, input: UpsertCustomerAddressInput!): CustomerAddressType!
+  updateCustomerAddress(id: ID!, input: UpsertCustomerAddressInput!): CustomerAddressType!
+  deleteCustomerAddress(id: ID!): Boolean!
 }
 
 input CreateVendorProfileInput {
@@ -317,4 +349,20 @@ input SyncServiceCategoryInput {
   id: String
   name: String!
   icon: String!
+}
+
+input UpsertCustomerProfileInput {
+  name: String!
+  phone: String!
+  email: String
+  location: String
+}
+
+input UpsertCustomerAddressInput {
+  label: String!
+  street: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  type: String!
 }

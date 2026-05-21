@@ -38,6 +38,7 @@ model User {
   role          Role?          @relation(fields: [roleId], references: [id])
   bookings      Booking[]
   vendorProfile VendorProfile?
+  customerProfile CustomerProfile?
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   deletedAt     DateTime?      @map("deleted_at")
@@ -253,3 +254,41 @@ model ServiceCategory {
   @@index([deletedAt])
   @@map("service_categories")
 }
+
+model CustomerProfile {
+  id             String            @id @default(uuid())
+  userId         String            @unique @map("user_id")
+  user           User              @relation(fields: [userId], references: [id])
+  name           String
+  phone          String
+  email          String?
+  location       String?
+  addresses      CustomerAddress[]
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  deletedAt      DateTime?         @map("deleted_at")
+
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("customer_profiles")
+}
+
+model CustomerAddress {
+  id                String          @id @default(uuid())
+  customerProfileId String          @map("customer_profile_id")
+  customerProfile   CustomerProfile @relation(fields: [customerProfileId], references: [id])
+  label             String
+  street            String
+  city              String
+  state             String
+  zipCode           String          @map("zip_code")
+  type              String // 'home' | 'work' | 'office'
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
+
+  @@index([customerProfileId])
+  @@index([deletedAt])
+  @@map("customer_addresses")
+}
+
