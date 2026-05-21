@@ -17,11 +17,8 @@ export class BankDetailsService {
 
   async findByVendorProfileId(
     vendorProfileId: string,
-  ): Promise<BankDetailsEntity> {
-    return assertFound(
-      await this.repository.findByVendorProfileId(vendorProfileId),
-      `Bank details for vendor ${vendorProfileId}`,
-    );
+  ): Promise<BankDetailsEntity | null> {
+    return this.repository.findByVendorProfileId(vendorProfileId);
   }
 
   async delete(id: string): Promise<boolean> {

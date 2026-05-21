@@ -7,10 +7,10 @@ import { UpsertBankDetailsInput } from '../inputs';
 export class BankDetailsResolver {
   constructor(private readonly service: BankDetailsService) {}
 
-  @Query(() => BankDetailsType)
+  @Query(() => BankDetailsType, { nullable: true })
   async getVendorBankDetails(
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
-  ): Promise<BankDetailsType> {
+  ): Promise<BankDetailsType | null> {
     return this.service.findByVendorProfileId(vendorProfileId) as any;
   }
 
