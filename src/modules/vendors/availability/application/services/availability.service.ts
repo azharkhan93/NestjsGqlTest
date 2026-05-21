@@ -42,7 +42,7 @@ export class AvailabilityService {
     }
 
     const profile = await this.vendorProfileService.findByUserId(user.sub);
-    if (!targetId || profile.id !== targetId) {
+    if (!targetId || !profile || profile.id !== targetId) {
       throw new ForbiddenException(
         'You do not have permission to manage this vendor availability',
       );

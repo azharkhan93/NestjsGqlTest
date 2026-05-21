@@ -34,9 +34,8 @@ export class VendorProfileResolver {
     @Args('input') input: CreateVendorProfileInput,
     @CurrentUser() user: any,
   ) {
-    // Super admin can provide an explicit userId; otherwise default to caller's own id
     input.userId = input.userId || user.sub;
-    return this.service.create(input);
+    return this.service.createOrUpdate(input);
   }
 
   @Mutation(() => VendorProfileType)

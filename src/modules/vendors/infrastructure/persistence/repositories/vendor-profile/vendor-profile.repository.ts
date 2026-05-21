@@ -21,6 +21,16 @@ export class VendorProfileRepository
     return profile ? this.toEntity(profile) : null;
   }
 
+  async upsertByUserId(entity: VendorProfileEntity): Promise<VendorProfileEntity> {
+    const data = this.toPrisma(entity);
+    const result = await this.model.upsert({
+      where: { userId: entity.userId },
+      update: data,
+      create: data,
+    });
+    return this.toEntity(result);
+  }
+
   toEntity(model: PrismaVendorProfile): VendorProfileEntity {
     return new VendorProfileEntity({
       ...model,

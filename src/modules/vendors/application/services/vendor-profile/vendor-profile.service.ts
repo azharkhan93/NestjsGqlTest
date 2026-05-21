@@ -15,6 +15,10 @@ export class VendorProfileService {
     return this.repository.create(VendorProfileEntity.create(input));
   }
 
+  async createOrUpdate(input: CreateVendorProfileInput) {
+    return this.repository.upsertByUserId(VendorProfileEntity.create(input));
+  }
+
   async update(id: string, input: UpdateVendorProfileInput) {
     return assertFound(
       await this.repository.update(id, input as any),
@@ -23,10 +27,7 @@ export class VendorProfileService {
   }
 
   async findByUserId(userId: string) {
-    return assertFound(
-      await this.repository.findByUserId(userId),
-      `Profile for user ${userId}`,
-    );
+    return this.repository.findByUserId(userId);
   }
 
   async findById(id: string) {
