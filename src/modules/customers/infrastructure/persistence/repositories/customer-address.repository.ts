@@ -16,7 +16,9 @@ export class CustomerAddressRepository
     super(prisma, 'customerAddress');
   }
 
-  async findByCustomerProfileId(customerProfileId: string): Promise<CustomerAddressEntity[]> {
+  async findByCustomerProfileId(
+    customerProfileId: string,
+  ): Promise<CustomerAddressEntity[]> {
     const results = await this.model.findMany({
       where: { customerProfileId },
     });

@@ -19,7 +19,10 @@ export class CustomerProfileService {
   }
 
   async findById(id: string): Promise<CustomerProfileEntity> {
-    return assertFound(await this.repository.findOne(id), `Customer profile ${id}`);
+    return assertFound(
+      await this.repository.findOne(id),
+      `Customer profile ${id}`,
+    );
   }
 
   async delete(id: string): Promise<boolean> {

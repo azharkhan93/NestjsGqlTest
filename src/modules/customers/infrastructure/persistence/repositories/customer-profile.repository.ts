@@ -3,9 +3,15 @@ import {
   PrismaRepository,
   PrismaService,
 } from '@common/infrastructure/persistence';
-import { CustomerProfileEntity, CustomerAddressEntity } from '../../../domain/entities';
+import {
+  CustomerProfileEntity,
+  CustomerAddressEntity,
+} from '../../../domain/entities';
 import { ICustomerProfileRepository } from '../../../domain/repositories/customer-profile.repository.interface';
-import { CustomerProfile as PrismaCustomerProfile, CustomerAddress as PrismaCustomerAddress } from '@prisma/client';
+import {
+  CustomerProfile as PrismaCustomerProfile,
+  CustomerAddress as PrismaCustomerAddress,
+} from '@prisma/client';
 
 @Injectable()
 export class CustomerProfileRepository
@@ -48,16 +54,21 @@ export class CustomerProfileRepository
     return this.toEntity(result);
   }
 
-  toEntity(model: PrismaCustomerProfile & { addresses?: PrismaCustomerAddress[] }): CustomerProfileEntity {
+  toEntity(
+    model: PrismaCustomerProfile & { addresses?: PrismaCustomerAddress[] },
+  ): CustomerProfileEntity {
     return new CustomerProfileEntity({
       ...model,
       email: model.email ?? undefined,
       location: model.location ?? undefined,
       deletedAt: model.deletedAt ?? undefined,
-      addresses: model.addresses?.map((addr) => new CustomerAddressEntity({
-        ...addr,
-        deletedAt: addr.deletedAt ?? undefined,
-      })),
+      addresses: model.addresses?.map(
+        (addr) =>
+          new CustomerAddressEntity({
+            ...addr,
+            deletedAt: addr.deletedAt ?? undefined,
+          }),
+      ),
     });
   }
 

@@ -7,7 +7,9 @@ import { CustomerAddressEntity } from '../../domain/entities/customer-address.en
 export class CustomerAddressService {
   constructor(private readonly repository: ICustomerAddressRepository) {}
 
-  async findByCustomerProfileId(customerProfileId: string): Promise<CustomerAddressEntity[]> {
+  async findByCustomerProfileId(
+    customerProfileId: string,
+  ): Promise<CustomerAddressEntity[]> {
     return this.repository.findByCustomerProfileId(customerProfileId);
   }
 
