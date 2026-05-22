@@ -43,8 +43,7 @@ model User {
   updatedAt     DateTime       @updatedAt @map("updated_at")
   deletedAt     DateTime?      @map("deleted_at")
 
-  @@index([roleId])
-  @@index([deletedAt])
+  @@index([roleId, deletedAt])
   @@map("users")
 }
 
@@ -73,7 +72,6 @@ model VendorProfile {
   breaks         VendorBreak[]
   exceptions     VendorException[]
 
-  @@index([userId])
   @@index([deletedAt])
   @@map("vendor_profiles")
 }
@@ -99,6 +97,7 @@ model VendorBreak {
   startTime       String // HH:mm
   endTime         String // HH:mm
 
+  @@index([vendorProfileId])
   @@map("vendor_breaks")
 }
 
@@ -118,6 +117,7 @@ model VendorException {
   endTime         String? // Nullable if BLOCKED_OUT
 
   @@unique([vendorProfileId, date])
+  @@index([date])
   @@map("vendor_exceptions")
 }
 
@@ -133,7 +133,6 @@ model VendorBankDetails {
   updatedAt       DateTime      @updatedAt @map("updated_at")
   deletedAt       DateTime?     @map("deleted_at")
 
-  @@index([vendorProfileId])
   @@index([deletedAt])
   @@map("vendor_bank_details")
 }
@@ -155,8 +154,7 @@ model Service {
   updatedAt       DateTime       @updatedAt @map("updated_at")
   deletedAt       DateTime?      @map("deleted_at")
 
-  @@index([vendorProfileId])
-  @@index([deletedAt])
+  @@index([vendorProfileId, deletedAt])
   @@map("services")
 }
 
@@ -182,10 +180,10 @@ model Booking {
   updatedAt   DateTime      @updatedAt @map("updated_at")
   deletedAt   DateTime?     @map("deleted_at")
 
-  @@index([userId])
-  @@index([serviceId])
-  @@index([status])
-  @@index([deletedAt])
+  @@index([userId, deletedAt])
+  @@index([serviceId, deletedAt])
+  @@index([status, deletedAt])
+  @@index([scheduledAt])
   @@map("bookings")
 }
 
@@ -199,9 +197,7 @@ model Review {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@index([bookingId])
-  @@index([rating])
-  @@index([deletedAt])
+  @@index([rating, deletedAt])
   @@map("reviews")
 }
 
@@ -215,9 +211,7 @@ model Dispute {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@index([bookingId])
-  @@index([status])
-  @@index([deletedAt])
+  @@index([status, deletedAt])
   @@map("disputes")
 }
 
@@ -231,8 +225,7 @@ model Verification {
   updatedAt   DateTime  @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
-  @@index([phoneNumber, code])
-  @@index([deletedAt])
+  @@index([phoneNumber, code, deletedAt])
   @@map("verifications")
 }
 
@@ -273,7 +266,6 @@ model CustomerProfile {
   updatedAt      DateTime          @updatedAt @map("updated_at")
   deletedAt      DateTime?         @map("deleted_at")
 
-  @@index([userId])
   @@index([deletedAt])
   @@map("customer_profiles")
 }
@@ -292,8 +284,7 @@ model CustomerAddress {
   updatedAt         DateTime        @updatedAt @map("updated_at")
   deletedAt         DateTime?       @map("deleted_at")
 
-  @@index([customerProfileId])
-  @@index([deletedAt])
+  @@index([customerProfileId, deletedAt])
   @@map("customer_addresses")
 }
 
