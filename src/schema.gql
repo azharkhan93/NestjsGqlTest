@@ -182,6 +182,15 @@ type CustomerProfileType {
   updatedAt: DateTime!
 }
 
+type DriverLocationType {
+  bookingId: ID!
+  latitude: Float!
+  longitude: Float!
+  status: String!
+  eta: Int!
+  updatedAt: DateTime!
+}
+
 type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
@@ -198,6 +207,7 @@ type Query {
   serviceCategories: [ServiceCategory!]!
   getCustomerProfile(userId: String!): CustomerProfileType
   getCustomerAddresses(customerProfileId: ID!): [CustomerAddressType!]!
+  driverLocation(bookingId: ID!): DriverLocationType
 }
 
 type Mutation {
@@ -238,6 +248,7 @@ type Mutation {
   createCustomerAddress(customerProfileId: ID!, input: UpsertCustomerAddressInput!): CustomerAddressType!
   updateCustomerAddress(id: ID!, input: UpsertCustomerAddressInput!): CustomerAddressType!
   deleteCustomerAddress(id: ID!): Boolean!
+  updateDriverLocation(bookingId: ID!, latitude: Float!, longitude: Float!, status: String!, eta: Int!): DriverLocationType!
 }
 
 input CreateVendorProfileInput {
@@ -377,4 +388,8 @@ input UpsertCustomerAddressInput {
   state: String!
   zipCode: String!
   type: String!
+}
+
+type Subscription {
+  driverLocationUpdated(bookingId: ID!): DriverLocationType!
 }
