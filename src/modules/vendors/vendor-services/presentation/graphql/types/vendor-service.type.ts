@@ -1,5 +1,14 @@
 import { Field, Float, ID, Int, ObjectType } from '@nestjs/graphql';
 
+@ObjectType('ServicePricing')
+export class ServicePricingType {
+  @Field(() => ID)
+  categoryId: string;
+
+  @Field(() => Float)
+  price: number;
+}
+
 @ObjectType('VendorService')
 export class VendorServiceType {
   @Field(() => ID)
@@ -31,6 +40,15 @@ export class VendorServiceType {
 
   @Field(() => ID, { nullable: true })
   categoryId?: string | null;
+
+  @Field(() => Boolean)
+  availableAtHome: boolean;
+
+  @Field(() => Boolean)
+  availableAtCenter: boolean;
+
+  @Field(() => [ServicePricingType], { nullable: true })
+  pricings?: ServicePricingType[];
 
   @Field()
   createdAt: Date;

@@ -70,6 +70,11 @@ type BankDetailsType {
   updatedAt: DateTime!
 }
 
+type ServicePricing {
+  categoryId: ID!
+  price: Float!
+}
+
 type VendorService {
   id: ID!
   vendorProfileId: ID!
@@ -81,6 +86,9 @@ type VendorService {
   features: [String!]!
   images: [String!]!
   categoryId: ID
+  availableAtHome: Boolean!
+  availableAtCenter: Boolean!
+  pricings: [ServicePricing!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -298,6 +306,14 @@ input CreateVendorServiceInput {
   features: [String!]! = []
   images: [String!]! = []
   categoryId: ID
+  availableAtHome: Boolean! = true
+  availableAtCenter: Boolean! = true
+  pricings: [ServicePricingInput!]
+}
+
+input ServicePricingInput {
+  categoryId: ID!
+  price: Float!
 }
 
 input UpdateVendorServiceInput {
@@ -309,6 +325,9 @@ input UpdateVendorServiceInput {
   features: [String!]
   images: [String!]
   categoryId: ID
+  availableAtHome: Boolean
+  availableAtCenter: Boolean
+  pricings: [ServicePricingInput!]
 }
 
 input UpdateScheduleInput {

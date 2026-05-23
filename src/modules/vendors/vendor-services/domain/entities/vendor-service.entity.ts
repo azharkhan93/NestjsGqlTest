@@ -1,5 +1,10 @@
 import { BaseEntity } from '@common/domain/entities';
 
+export interface ServicePricingDomain {
+  categoryId: string;
+  price: number;
+}
+
 export class VendorServiceEntity extends BaseEntity {
   vendorProfileId: string;
   name: string;
@@ -10,6 +15,9 @@ export class VendorServiceEntity extends BaseEntity {
   features: string[];
   images: string[];
   categoryId?: string | null;
+  availableAtHome: boolean;
+  availableAtCenter: boolean;
+  pricings?: ServicePricingDomain[];
   deletedAt?: Date | null;
 
   constructor(partial: Partial<VendorServiceEntity>) {

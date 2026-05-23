@@ -139,22 +139,25 @@ model VendorBankDetails {
 
 
 model Service {
-  id              String           @id @default(uuid())
-  vendorProfileId String           @map("vendor_profile_id")
-  vendorProfile   VendorProfile    @relation(fields: [vendorProfileId], references: [id])
-  categoryId      String?          @map("category_id")
-  category        ServiceCategory? @relation(fields: [categoryId], references: [id])
-  name            String
-  description     String?
-  price           Float
-  duration        Int // duration in minutes
-  location        String?
-  features        String[]       @default([])
-  images          String[]       @default([])
-  bookings        Booking[]
-  createdAt       DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @updatedAt @map("updated_at")
-  deletedAt       DateTime?      @map("deleted_at")
+  id                String           @id @default(uuid())
+  vendorProfileId   String           @map("vendor_profile_id")
+  vendorProfile     VendorProfile    @relation(fields: [vendorProfileId], references: [id])
+  categoryId        String?          @map("category_id")
+  category          ServiceCategory? @relation(fields: [categoryId], references: [id])
+  name              String
+  description       String?
+  price             Float
+  duration          Int // duration in minutes
+  location          String?
+  features          String[]         @default([])
+  images            String[]         @default([])
+  bookings          Booking[]
+  availableAtHome   Boolean          @default(true) @map("available_at_home")
+  availableAtCenter Boolean          @default(true) @map("available_at_center")
+  pricings          ServicePricing[]
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+  deletedAt         DateTime?        @map("deleted_at")
 
   @@index([vendorProfileId, deletedAt])
   @@map("services")
@@ -248,12 +251,28 @@ model ServiceCategory {
   icon      String
   vendors   VendorProfile[]
   services  Service[]
+  pricings  ServicePricing[]
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
   @@index([deletedAt])
   @@map("service_categories")
+}
+
+model ServicePricing {
+  id          String          @id @default(uuid())
+  serviceId   String          @map("service_id")
+  service     Service         @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  categoryId  String          @map("category_id")
+  category    ServiceCategory @relation(fields: [categoryId], references: [id])
+  price       Float
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([serviceId, categoryId])
+  @@map("service_pricings")
 }
 
 model CustomerProfile {

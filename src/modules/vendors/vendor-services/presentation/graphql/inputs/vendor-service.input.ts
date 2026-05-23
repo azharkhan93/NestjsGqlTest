@@ -1,6 +1,15 @@
 import { Field, Float, ID, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
+export class ServicePricingInput {
+  @Field(() => ID)
+  categoryId: string;
+
+  @Field(() => Float)
+  price: number;
+}
+
+@InputType()
 export class CreateVendorServiceInput {
   @Field(() => ID)
   vendorProfileId: string;
@@ -28,6 +37,15 @@ export class CreateVendorServiceInput {
 
   @Field(() => ID, { nullable: true })
   categoryId?: string;
+
+  @Field(() => Boolean, { defaultValue: true })
+  availableAtHome: boolean;
+
+  @Field(() => Boolean, { defaultValue: true })
+  availableAtCenter: boolean;
+
+  @Field(() => [ServicePricingInput], { nullable: true })
+  pricings?: ServicePricingInput[];
 }
 
 @InputType()
@@ -55,4 +73,13 @@ export class UpdateVendorServiceInput {
 
   @Field(() => ID, { nullable: true })
   categoryId?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  availableAtHome?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  availableAtCenter?: boolean;
+
+  @Field(() => [ServicePricingInput], { nullable: true })
+  pricings?: ServicePricingInput[];
 }
