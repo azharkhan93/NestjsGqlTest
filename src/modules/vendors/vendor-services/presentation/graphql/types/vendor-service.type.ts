@@ -29,6 +29,9 @@ export class VendorServiceType {
   @Field(() => [String])
   images: string[];
 
+  @Field(() => ID, { nullable: true })
+  categoryId?: string | null;
+
   @Field()
   createdAt: Date;
 

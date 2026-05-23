@@ -4,12 +4,23 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
+  protected async shouldSkip(context: ExecutionContext): Promise<boolean> {
+    if (
+      context.getType<string>() === 'graphql' &&
+      GqlExecutionContext.create(context).getInfo()?.operation?.operation ===
+        'subscription'
+    ) {
+      return true;
+    }
+    return super.shouldSkip(context);
+  }
+
   protected getRequestResponse(context: ExecutionContext) {
     const gqlCtx = GqlExecutionContext.create(context);
     const ctx = gqlCtx.getContext();
 
-    const req = ctx.req || ctx;
-    const res = ctx.res;
+    const req = ctx?.req || ctx;
+    const res = ctx?.res;
 
     return { req, res };
   }

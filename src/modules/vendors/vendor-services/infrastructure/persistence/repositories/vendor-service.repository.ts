@@ -42,6 +42,7 @@ export class VendorServiceRepository
       location: entity.location,
       features: entity.features,
       images: entity.images,
+      categoryId: entity.categoryId,
     };
   }
 }

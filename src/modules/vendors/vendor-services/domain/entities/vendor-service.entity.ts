@@ -9,6 +9,7 @@ export class VendorServiceEntity extends BaseEntity {
   location?: string | null;
   features: string[];
   images: string[];
+  categoryId?: string | null;
   deletedAt?: Date | null;
 
   constructor(partial: Partial<VendorServiceEntity>) {

@@ -80,6 +80,7 @@ type VendorService {
   location: String
   features: [String!]!
   images: [String!]!
+  categoryId: ID
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -296,6 +297,7 @@ input CreateVendorServiceInput {
   location: String
   features: [String!]! = []
   images: [String!]! = []
+  categoryId: ID
 }
 
 input UpdateVendorServiceInput {
@@ -306,6 +308,7 @@ input UpdateVendorServiceInput {
   location: String
   features: [String!]
   images: [String!]
+  categoryId: ID
 }
 
 input UpdateScheduleInput {

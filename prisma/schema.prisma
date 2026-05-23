@@ -139,9 +139,11 @@ model VendorBankDetails {
 
 
 model Service {
-  id              String         @id @default(uuid())
-  vendorProfileId String         @map("vendor_profile_id")
-  vendorProfile   VendorProfile  @relation(fields: [vendorProfileId], references: [id])
+  id              String           @id @default(uuid())
+  vendorProfileId String           @map("vendor_profile_id")
+  vendorProfile   VendorProfile    @relation(fields: [vendorProfileId], references: [id])
+  categoryId      String?          @map("category_id")
+  category        ServiceCategory? @relation(fields: [categoryId], references: [id])
   name            String
   description     String?
   price           Float
@@ -245,6 +247,7 @@ model ServiceCategory {
   name      String
   icon      String
   vendors   VendorProfile[]
+  services  Service[]
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")

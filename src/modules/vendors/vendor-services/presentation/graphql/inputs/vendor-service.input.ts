@@ -25,6 +25,9 @@ export class CreateVendorServiceInput {
 
   @Field(() => [String], { defaultValue: [] })
   images: string[];
+
+  @Field(() => ID, { nullable: true })
+  categoryId?: string;
 }
 
 @InputType()
@@ -49,4 +52,7 @@ export class UpdateVendorServiceInput {
 
   @Field(() => [String], { nullable: true })
   images?: string[];
+
+  @Field(() => ID, { nullable: true })
+  categoryId?: string;
 }

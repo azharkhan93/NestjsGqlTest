@@ -17,6 +17,29 @@ export class VerificationService {
 
   async requestOtp(rawPhone: string) {
     const phoneNumber = PhoneNumber.create(rawPhone);
+    const val = phoneNumber.getValue;
+
+    // Direct static testing bypass for local/production client review
+    if (val === '+919999999999' || val === '+918888888888') {
+      const code = val === '+919999999999' ? '111111' : '222222';
+      const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
+
+      await this.repository.save({
+        phoneNumber: val,
+        code,
+        expiresAt,
+      });
+
+      this.logger.log(
+        `Bypassed Twilio SMS for dummy test number ${val} - Code set to ${code}`,
+      );
+      return {
+        success: true,
+        sid: 'DUMMY_SMS_SID',
+        message: 'OTP generated (Bypassed Twilio)',
+      };
+    }
+
     const code = randomInt(100000, 999999).toString();
     const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
 
@@ -38,6 +61,19 @@ export class VerificationService {
 
   async verifyOtp(rawPhone: string, code: string) {
     const phoneNumber = PhoneNumber.create(rawPhone);
+    const val = phoneNumber.getValue;
+
+    // Static testing bypass for client verification
+    if (
+      (val === '+919999999999' && code === '111111') ||
+      (val === '+918888888888' && code === '222222')
+    ) {
+      this.logger.log(
+        `Bypassed verification matching for dummy test number ${val}`,
+      );
+      return { success: true, message: 'Verification successful (Bypassed)' };
+    }
+
     const verification = await this.repository.findByPhoneAndCode(
       phoneNumber.getValue,
       code,
