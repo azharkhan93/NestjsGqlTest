@@ -31,7 +31,9 @@ export class VendorProfileRepository
     return results.map((result) => this.toEntity(result));
   }
 
-  override async create(item: VendorProfileEntity): Promise<VendorProfileEntity> {
+  override async create(
+    item: VendorProfileEntity,
+  ): Promise<VendorProfileEntity> {
     const data = this.toPrisma(item);
     const result = await this.model.create({
       data,
@@ -40,7 +42,10 @@ export class VendorProfileRepository
     return this.toEntity(result);
   }
 
-  override async update(id: string, item: Partial<VendorProfileEntity>): Promise<VendorProfileEntity | null> {
+  override async update(
+    id: string,
+    item: Partial<VendorProfileEntity>,
+  ): Promise<VendorProfileEntity | null> {
     const data = this.toPrisma(item as VendorProfileEntity);
     const result = await this.model.update({
       where: { id },
@@ -58,7 +63,9 @@ export class VendorProfileRepository
     return profile ? this.toEntity(profile) : null;
   }
 
-  async upsertByUserId(entity: VendorProfileEntity): Promise<VendorProfileEntity> {
+  async upsertByUserId(
+    entity: VendorProfileEntity,
+  ): Promise<VendorProfileEntity> {
     const data = this.toPrisma(entity);
     const result = await this.model.upsert({
       where: { userId: entity.userId },
@@ -69,7 +76,27 @@ export class VendorProfileRepository
     return this.toEntity(result);
   }
 
-  toEntity(model: PrismaVendorProfile & { categories?: any[] }): VendorProfileEntity {
+  async search(query: string): Promise<VendorProfileEntity[]> {
+    const results = await this.model.findMany({
+      where: {
+        OR: [
+          { businessName: { contains: query, mode: 'insensitive' } },
+          { description: { contains: query, mode: 'insensitive' } },
+          {
+            services: {
+              some: { name: { contains: query, mode: 'insensitive' } },
+            },
+          },
+        ],
+      },
+      include: { categories: true },
+    });
+    return results.map((result) => this.toEntity(result));
+  }
+
+  toEntity(
+    model: PrismaVendorProfile & { categories?: any[] },
+  ): VendorProfileEntity {
     return new VendorProfileEntity({
       ...model,
       imageUri: model.imageUri ?? undefined,

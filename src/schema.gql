@@ -206,6 +206,7 @@ type Query {
   getVendorProfile(userId: String!): VendorProfileType!
   getVendorProfiles: [VendorProfileType!]!
   getVendorProfileById(id: ID!): VendorProfileType!
+  searchVendors(query: String!): [VendorProfileType!]!
   getVendorBankDetails(vendorProfileId: ID!): BankDetailsType
   getVendorServices(vendorProfileId: ID!): [VendorService!]!
   getVendorService(id: ID!): VendorService!

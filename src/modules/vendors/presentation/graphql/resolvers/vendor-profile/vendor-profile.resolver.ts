@@ -46,6 +46,11 @@ export class VendorProfileResolver {
     return this.service.update(id, input);
   }
 
+  @Query(() => [VendorProfileType])
+  async searchVendors(@Args('query') query: string) {
+    return this.service.search(query);
+  }
+
   @Mutation(() => Boolean)
   async deleteVendorProfile(@Args('id', { type: () => ID }) id: string) {
     return this.service.delete(id);

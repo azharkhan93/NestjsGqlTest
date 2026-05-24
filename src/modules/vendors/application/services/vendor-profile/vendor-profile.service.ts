@@ -42,4 +42,8 @@ export class VendorProfileService {
     assertFound(await this.repository.remove(id), `Profile ${id}`);
     return true;
   }
+
+  async search(query: string) {
+    return this.repository.search(query);
+  }
 }
