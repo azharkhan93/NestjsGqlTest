@@ -59,6 +59,16 @@ export class UserService {
     return assertFound(await this.repository.findOne(id), `User ${id}`);
   }
 
+  async update(id: string, data: Partial<UserEntity>): Promise<UserEntity> {
+    const user = await this.findById(id);
+    const updatedEntity = new UserEntity({
+      ...user,
+      ...data,
+    });
+    const result = await this.repository.update(id, updatedEntity);
+    return assertFound(result, `User ${id}`);
+  }
+
   async delete(id: string): Promise<boolean> {
     const user = await this.findById(id);
 

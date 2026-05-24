@@ -46,6 +46,14 @@ export class UserResolver {
     return this.service.loginByPhone(phoneNumber, code, role);
   }
 
+  @Mutation(() => UserType)
+  async updateUserAvatar(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('avatarUrl') avatarUrl: string,
+  ) {
+    return this.service.update(id, { avatarUrl });
+  }
+
   @Mutation(() => Boolean)
   async deleteUser(@Args('id', { type: () => ID }) id: string) {
     return this.service.delete(id);

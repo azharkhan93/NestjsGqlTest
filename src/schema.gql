@@ -241,6 +241,7 @@ type Mutation {
   updateVendorException(id: ID!, input: UpdateExceptionInput!): VendorException!
   removeVendorException(id: ID!): Boolean!
   loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): AuthPayloadType!
+  updateUserAvatar(id: ID!, avatarUrl: String!): UserType!
   deleteUser(id: ID!): Boolean!
   logout: Boolean!
   uploadImage(file: Upload!): UploadResponseType!
