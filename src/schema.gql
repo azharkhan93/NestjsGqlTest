@@ -200,6 +200,23 @@ type DriverLocationType {
   updatedAt: DateTime!
 }
 
+type NotificationType {
+  id: ID!
+  userId: String!
+  title: String!
+  body: String!
+  isRead: Boolean!
+  createdAt: DateTime!
+}
+
+type UserDeviceTokenType {
+  id: ID!
+  userId: String!
+  fcmToken: String!
+  deviceType: String!
+  createdAt: DateTime!
+}
+
 type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
@@ -218,6 +235,7 @@ type Query {
   getCustomerProfile(userId: String!): CustomerProfileType
   getCustomerAddresses(customerProfileId: ID!): [CustomerAddressType!]!
   driverLocation(bookingId: ID!): DriverLocationType
+  getUserNotifications: [NotificationType!]!
 }
 
 type Mutation {
@@ -260,6 +278,9 @@ type Mutation {
   updateCustomerAddress(id: ID!, input: UpsertCustomerAddressInput!): CustomerAddressType!
   deleteCustomerAddress(id: ID!): Boolean!
   updateDriverLocation(bookingId: ID!, latitude: Float!, longitude: Float!, status: String!, eta: Int!): DriverLocationType!
+  registerDeviceToken(input: RegisterDeviceTokenInput!): UserDeviceTokenType!
+  markNotificationAsRead(id: ID!): NotificationType
+  sendBookingNotification(bookingId: ID!, type: String!): Boolean!
 }
 
 input CreateVendorProfileInput {
@@ -412,6 +433,11 @@ input UpsertCustomerAddressInput {
   state: String!
   zipCode: String!
   type: String!
+}
+
+input RegisterDeviceTokenInput {
+  fcmToken: String!
+  deviceType: String!
 }
 
 type Subscription {

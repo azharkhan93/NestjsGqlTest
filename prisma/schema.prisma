@@ -39,6 +39,8 @@ model User {
   bookings      Booking[]
   vendorProfile VendorProfile?
   customerProfile CustomerProfile?
+  deviceTokens  UserDeviceToken[]
+  notifications Notification[]
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   deletedAt     DateTime?      @map("deleted_at")
@@ -309,4 +311,30 @@ model CustomerAddress {
   @@index([customerProfileId, deletedAt])
   @@map("customer_addresses")
 }
+
+model UserDeviceToken {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fcmToken    String   @unique @map("fcm_token")
+  deviceType  String   @map("device_type") // "ios" | "android"
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("user_device_tokens")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
 
