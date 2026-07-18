@@ -25,9 +25,6 @@ import { CustomerAddressRepository } from './infrastructure/persistence/reposito
       useClass: CustomerAddressRepository,
     },
   ],
-  exports: [
-    CustomerProfileService,
-    CustomerAddressService,
-  ],
+  exports: [CustomerProfileService, CustomerAddressService],
 })
 export class CustomersModule {}

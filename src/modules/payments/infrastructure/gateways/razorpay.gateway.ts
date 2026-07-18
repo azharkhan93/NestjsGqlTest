@@ -99,7 +99,6 @@ export class RazorpayGateway implements IPaymentGateway {
     throw new Error('Failed to initialize payment: Max attempts exceeded');
   }
 
-
   verifySignature(
     orderId: string,
     paymentId: string,
@@ -126,4 +125,3 @@ export class RazorpayGateway implements IPaymentGateway {
     }
   }
 }
-

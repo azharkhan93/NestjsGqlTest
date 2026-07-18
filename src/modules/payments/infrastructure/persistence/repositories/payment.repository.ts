@@ -49,7 +49,6 @@ export class PaymentRepository
     });
   }
 
-
   toPrisma(entity: PaymentEntity): Record<string, unknown> {
     return {
       customerProfileId: entity.customerProfileId,

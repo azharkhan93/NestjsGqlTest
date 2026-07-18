@@ -37,5 +37,4 @@ export class PaymentEntity extends BaseEntity {
       status: data.status || PaymentStatus.PENDING,
     });
   }
-
 }

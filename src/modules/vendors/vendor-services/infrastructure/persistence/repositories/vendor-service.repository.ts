@@ -36,14 +36,15 @@ export class VendorServiceRepository
 
   async create(item: VendorServiceEntity): Promise<VendorServiceEntity> {
     const data = this.toPrisma(item);
-    const pricingsData = item.pricings && item.pricings.length > 0
-      ? {
-          create: item.pricings.map((p) => ({
-            categoryId: p.categoryId,
-            price: p.price,
-          })),
-        }
-      : undefined;
+    const pricingsData =
+      item.pricings && item.pricings.length > 0
+        ? {
+            create: item.pricings.map((p) => ({
+              categoryId: p.categoryId,
+              price: p.price,
+            })),
+          }
+        : undefined;
 
     const result = await this.model.create({
       data: {

@@ -1,7 +1,6 @@
 import { BaseEntity } from '@common/domain/entities/base.entity';
 import { CustomerAddressEntity } from './customer-address.entity';
 
-
 export class CustomerProfileEntity extends BaseEntity {
   userId: string;
   name: string;

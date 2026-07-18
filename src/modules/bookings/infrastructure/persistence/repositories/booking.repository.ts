@@ -3,8 +3,14 @@ import {
   PrismaRepository,
   PrismaService,
 } from '@common/infrastructure/persistence';
-import { BookingEntity, BookingStatus } from '@modules/bookings/domain/entities';
-import { Booking as PrismaBooking, BookingStatus as PrismaBookingStatus } from '@prisma/client';
+import {
+  BookingEntity,
+  BookingStatus,
+} from '@modules/bookings/domain/entities';
+import {
+  Booking as PrismaBooking,
+  BookingStatus as PrismaBookingStatus,
+} from '@prisma/client';
 import { IBookingRepository } from '@modules/bookings/domain/repositories';
 
 @Injectable()

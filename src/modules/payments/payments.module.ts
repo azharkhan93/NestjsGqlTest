@@ -29,5 +29,3 @@ import { RazorpayGateway } from './infrastructure/gateways/razorpay.gateway';
   exports: [PaymentService],
 })
 export class PaymentsModule {}
-
-
