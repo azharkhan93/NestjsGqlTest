@@ -11,10 +11,13 @@ export class RazorpayGateway implements IPaymentGateway {
 
   constructor(private readonly configService: ConfigService) {
     this.keyId = this.configService.get<string>('RAZORPAY_KEY_ID') || '';
-    this.keySecret = this.configService.get<string>('RAZORPAY_KEY_SECRET') || '';
+    this.keySecret =
+      this.configService.get<string>('RAZORPAY_KEY_SECRET') || '';
 
     if (!this.keyId || !this.keySecret) {
-      this.logger.error('Razorpay credentials missing in environment variables');
+      this.logger.error(
+        'Razorpay credentials missing in environment variables',
+      );
     }
   }
 
@@ -26,8 +29,10 @@ export class RazorpayGateway implements IPaymentGateway {
     amount: number;
     currency: string;
   }> {
-    const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64');
-    
+    const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString(
+      'base64',
+    );
+
     try {
       const response = await fetch('https://api.razorpay.com/v1/orders', {
         method: 'POST',
@@ -45,7 +50,9 @@ export class RazorpayGateway implements IPaymentGateway {
       if (!response.ok) {
         const errorText = await response.text();
         this.logger.error(`Razorpay order creation failed: ${errorText}`);
-        throw new Error(`Razorpay order creation failed: ${response.statusText}`);
+        throw new Error(
+          `Razorpay order creation failed: ${response.statusText}`,
+        );
       }
 
       const data = (await response.json()) as {

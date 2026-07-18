@@ -1,4 +1,10 @@
-import { Field, ID, ObjectType, registerEnumType, Float } from '@nestjs/graphql';
+import {
+  Field,
+  ID,
+  ObjectType,
+  registerEnumType,
+  Float,
+} from '@nestjs/graphql';
 import { PaymentStatus } from '../../../domain/entities/payment.entity';
 
 registerEnumType(PaymentStatus, {

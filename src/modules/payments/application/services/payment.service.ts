@@ -1,9 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { IPaymentRepository } from '../../domain/repositories/payment.repository.interface';
 import { IPaymentGateway } from '../../domain/ports/payment-gateway.interface';
-import { PaymentEntity, PaymentStatus } from '../../domain/entities/payment.entity';
+import {
+  PaymentEntity,
+  PaymentStatus,
+} from '../../domain/entities/payment.entity';
 import { CustomerProfileService } from '@modules/customers/application/services/customer-profile.service';
-import { assertFound } from '@common/application/helpers';
 
 @Injectable()
 export class PaymentService {
@@ -47,7 +49,9 @@ export class PaymentService {
     // 1. Find existing pending payment
     const payment = await this.paymentRepository.findByOrderId(orderId);
     if (!payment) {
-      throw new BadRequestException(`Payment order with ID ${orderId} not found`);
+      throw new BadRequestException(
+        `Payment order with ID ${orderId} not found`,
+      );
     }
 
     if (payment.status === PaymentStatus.SUCCESS) {
@@ -55,11 +59,19 @@ export class PaymentService {
     }
 
     // 2. Verify signature using gateway
-    const isValid = this.paymentGateway.verifySignature(orderId, paymentId, signature);
+    const isValid = this.paymentGateway.verifySignature(
+      orderId,
+      paymentId,
+      signature,
+    );
     if (!isValid) {
       payment.status = PaymentStatus.FAILED;
-      await this.paymentRepository.update(payment.id, { status: PaymentStatus.FAILED });
-      throw new BadRequestException('Invalid payment signature verification failed');
+      await this.paymentRepository.update(payment.id, {
+        status: PaymentStatus.FAILED,
+      });
+      throw new BadRequestException(
+        'Invalid payment signature verification failed',
+      );
     }
 
     // 3. Update payment status to SUCCESS and save signature details

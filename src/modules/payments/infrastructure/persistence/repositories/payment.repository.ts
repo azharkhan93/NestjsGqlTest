@@ -3,7 +3,10 @@ import {
   PrismaRepository,
   PrismaService,
 } from '@common/infrastructure/persistence';
-import { PaymentEntity, PaymentStatus } from '../../../domain/entities/payment.entity';
+import {
+  PaymentEntity,
+  PaymentStatus,
+} from '../../../domain/entities/payment.entity';
 import { IPaymentRepository } from '../../../domain/repositories/payment.repository.interface';
 import { Payment as PrismaPayment } from '@prisma/client';
 
