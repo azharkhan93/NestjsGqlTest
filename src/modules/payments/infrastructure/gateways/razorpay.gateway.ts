@@ -15,8 +15,8 @@ export class RazorpayGateway implements IPaymentGateway {
       this.configService.get<string>('RAZORPAY_KEY_SECRET') || '';
 
     if (!this.keyId || !this.keySecret) {
-      this.logger.error(
-        'Razorpay credentials missing in environment variables',
+      throw new Error(
+        'Critical Configuration Error: Razorpay credentials (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET) are missing in environment variables.',
       );
     }
   }
@@ -32,46 +32,73 @@ export class RazorpayGateway implements IPaymentGateway {
     const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString(
       'base64',
     );
+    const receipt = `rcpt_${crypto.randomUUID()}`;
+    const idempotencyKey = `idemp_${crypto.randomUUID()}`;
 
-    try {
-      const response = await fetch('https://api.razorpay.com/v1/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${auth}`,
-        },
-        body: JSON.stringify({
-          amount: Math.round(amount * 100), // convert to paise
-          currency,
-          receipt: `rcpt_${Date.now()}`,
-        }),
-      });
+    let attempts = 0;
+    const maxAttempts = 3;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        this.logger.error(`Razorpay order creation failed: ${errorText}`);
-        throw new Error(
-          `Razorpay order creation failed: ${response.statusText}`,
-        );
+    while (attempts < maxAttempts) {
+      attempts++;
+      try {
+        const response = await fetch('https://api.razorpay.com/v1/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Basic ${auth}`,
+            'X-Idempotency-Key': idempotencyKey,
+          },
+          body: JSON.stringify({
+            amount: Math.round(amount * 100), // convert to paise
+            currency,
+            receipt,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          this.logger.warn(
+            `Razorpay API attempt ${attempts} failed: Status ${response.status}. Error: ${errorText}`,
+          );
+
+          // Retry on transient 5xx server errors, otherwise throw immediately
+          if (response.status >= 500 && attempts < maxAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, 500 * attempts));
+            continue;
+          }
+
+          throw new Error(
+            `Razorpay order creation failed with status ${response.status}: ${response.statusText}`,
+          );
+        }
+
+        const data = (await response.json()) as {
+          id: string;
+          amount: number;
+          currency: string;
+        };
+
+        return {
+          id: data.id,
+          amount: data.amount / 100, // convert back to standard currency units
+          currency: data.currency,
+        };
+      } catch (error: unknown) {
+        if (attempts >= maxAttempts) {
+          const msg = error instanceof Error ? error.message : String(error);
+          this.logger.error(
+            `Error creating Razorpay order after ${attempts} attempts: ${msg}`,
+          );
+          throw new Error(`Failed to initialize payment after retries: ${msg}`);
+        }
+        // Wait and retry for network/transient failures
+        await new Promise((resolve) => setTimeout(resolve, 500 * attempts));
       }
-
-      const data = (await response.json()) as {
-        id: string;
-        amount: number;
-        currency: string;
-      };
-
-      return {
-        id: data.id,
-        amount: data.amount / 100, // convert back to standard currency units
-        currency: data.currency,
-      };
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error creating Razorpay order: ${msg}`);
-      throw new Error(`Failed to initialize payment: ${msg}`);
     }
+
+    throw new Error('Failed to initialize payment: Max attempts exceeded');
   }
+
 
   verifySignature(
     orderId: string,
@@ -84,7 +111,14 @@ export class RazorpayGateway implements IPaymentGateway {
         .createHmac('sha256', this.keySecret)
         .update(text)
         .digest('hex');
-      return generatedSignature === signature;
+
+      const generatedBuffer = Buffer.from(generatedSignature, 'hex');
+      const signatureBuffer = Buffer.from(signature, 'hex');
+
+      if (generatedBuffer.length !== signatureBuffer.length) {
+        return false;
+      }
+      return crypto.timingSafeEqual(generatedBuffer, signatureBuffer);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error verifying signature: ${msg}`);
@@ -92,3 +126,4 @@ export class RazorpayGateway implements IPaymentGateway {
     }
   }
 }
+

@@ -1,19 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { assertFound } from '@common/application/helpers';
 import { IBookingRepository } from '@modules/bookings/domain/repositories';
-import { BookingEntity, BookingStatus } from '@modules/bookings/domain/entities';
-import { CreateBookingInput } from '../../presentation/graphql/inputs/create-booking.input';
+import {
+  BookingEntity,
+  BookingStatus,
+} from '@modules/bookings/domain/entities';
+
+export interface CreateBookingCommand {
+  serviceId: string;
+  scheduledAt: string | Date;
+}
 
 @Injectable()
 export class BookingService {
   constructor(private readonly repository: IBookingRepository) {}
 
-  async create(input: CreateBookingInput, userId: string) {
+  async create(command: CreateBookingCommand, userId: string) {
     const booking = BookingEntity.create({
       userId,
-      serviceId: input.serviceId,
+      serviceId: command.serviceId,
       status: BookingStatus.PENDING,
-      scheduledAt: new Date(input.scheduledAt),
+      scheduledAt: new Date(command.scheduledAt),
     });
     return this.repository.create(booking);
   }

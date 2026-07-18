@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { IPaymentRepository } from '../../domain/repositories/payment.repository.interface';
 import { IPaymentGateway } from '../../domain/ports/payment-gateway.interface';
 import {
@@ -41,10 +46,31 @@ export class PaymentService {
     return this.paymentRepository.create(payment);
   }
 
+  async getPaymentByOrderId(
+    orderId: string,
+    userId: string,
+  ): Promise<PaymentEntity> {
+    const payment = await this.paymentRepository.findByOrderId(orderId);
+    if (!payment) {
+      throw new NotFoundException(`Payment order with ID ${orderId} not found`);
+    }
+
+    // Ensure database reads are scoped to the authenticated user's profile
+    const profile = await this.customerProfileService.findByUserId(userId);
+    if (!profile || payment.customerProfileId !== profile.id) {
+      throw new ForbiddenException(
+        'You are not authorized to access this payment record',
+      );
+    }
+
+    return payment;
+  }
+
   async verifyPaymentSuccess(
     orderId: string,
     paymentId: string,
     signature: string,
+    userId: string,
   ): Promise<PaymentEntity> {
     // 1. Find existing pending payment
     const payment = await this.paymentRepository.findByOrderId(orderId);
@@ -54,18 +80,25 @@ export class PaymentService {
       );
     }
 
+    // 2. Verify signature request belongs to the payment session owner
+    const profile = await this.customerProfileService.findByUserId(userId);
+    if (!profile || payment.customerProfileId !== profile.id) {
+      throw new ForbiddenException(
+        'You are not authorized to verify this payment',
+      );
+    }
+
     if (payment.status === PaymentStatus.SUCCESS) {
       return payment;
     }
 
-    // 2. Verify signature using gateway
+    // 3. Verify signature using gateway
     const isValid = this.paymentGateway.verifySignature(
       orderId,
       paymentId,
       signature,
     );
     if (!isValid) {
-      payment.status = PaymentStatus.FAILED;
       await this.paymentRepository.update(payment.id, {
         status: PaymentStatus.FAILED,
       });
@@ -74,11 +107,7 @@ export class PaymentService {
       );
     }
 
-    // 3. Update payment status to SUCCESS and save signature details
-    payment.status = PaymentStatus.SUCCESS;
-    payment.razorpayPaymentId = paymentId;
-    payment.razorpaySignature = signature;
-
+    // 4. Update payment status to SUCCESS and save signature details
     const updated = await this.paymentRepository.update(payment.id, {
       status: PaymentStatus.SUCCESS,
       razorpayPaymentId: paymentId,

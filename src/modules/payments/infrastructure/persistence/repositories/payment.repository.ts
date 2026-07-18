@@ -27,6 +27,13 @@ export class PaymentRepository
   }
 
   toEntity(model: PrismaPayment): PaymentEntity {
+    const statusMap: Record<string, PaymentStatus> = {
+      PENDING: PaymentStatus.PENDING,
+      SUCCESS: PaymentStatus.SUCCESS,
+      FAILED: PaymentStatus.FAILED,
+    };
+    const status = statusMap[model.status] || PaymentStatus.PENDING;
+
     return new PaymentEntity({
       id: model.id,
       customerProfileId: model.customerProfileId,
@@ -35,12 +42,13 @@ export class PaymentRepository
       razorpaySignature: model.razorpaySignature ?? undefined,
       amount: model.amount,
       currency: model.currency,
-      status: model.status as unknown as PaymentStatus,
+      status,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
       deletedAt: model.deletedAt ?? undefined,
     });
   }
+
 
   toPrisma(entity: PaymentEntity): Record<string, unknown> {
     return {

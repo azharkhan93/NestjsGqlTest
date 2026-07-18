@@ -7,7 +7,12 @@ export class PasetoService {
   private readonly key: Buffer;
 
   constructor() {
-    const secret = process.env.PASETO_SECRET || 'xyzsecretkey';
+    const secret = process.env.PASETO_SECRET;
+    if (!secret) {
+      throw new Error(
+        'Critical Configuration Error: PASETO_SECRET environment variable is missing.',
+      );
+    }
     this.key = crypto.createHash('sha256').update(secret).digest();
   }
 
