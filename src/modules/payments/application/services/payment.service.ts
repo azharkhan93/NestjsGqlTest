@@ -11,6 +11,7 @@ import {
   PaymentStatus,
 } from '../../domain/entities/payment.entity';
 import { CustomerProfileService } from '@modules/customers/application/services/customer-profile.service';
+import { PaymentEventDispatcher } from './payment-event.dispatcher';
 
 @Injectable()
 export class PaymentService {
@@ -18,6 +19,7 @@ export class PaymentService {
     private readonly paymentRepository: IPaymentRepository,
     private readonly paymentGateway: IPaymentGateway,
     private readonly customerProfileService: CustomerProfileService,
+    private readonly paymentEventDispatcher: PaymentEventDispatcher,
   ) {}
 
   async createPayment(
@@ -117,6 +119,9 @@ export class PaymentService {
     if (!updated) {
       throw new BadRequestException('Failed to update payment status');
     }
+
+    // Trigger eventual consistency outbox event handler
+    this.paymentEventDispatcher.dispatchPaymentSuccess(updated.id, userId);
 
     return updated;
   }

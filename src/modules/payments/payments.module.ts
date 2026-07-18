@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { CommonModule } from '@common/common.module';
 import { CustomersModule } from '@modules/customers/customers.module';
+import { TrackingModule } from '@modules/tracking/tracking.module';
+import { NotificationsModule } from '@modules/notifications/notifications.module';
 import { PaymentService } from './application/services/payment.service';
+import { PaymentEventDispatcher } from './application/services/payment-event.dispatcher';
 import { PaymentResolver } from './presentation/graphql/resolvers/payment.resolver';
 import { IPaymentRepository } from './domain/repositories/payment.repository.interface';
 import { IPaymentGateway } from './domain/ports/payment-gateway.interface';
@@ -9,9 +12,10 @@ import { PaymentRepository } from './infrastructure/persistence/repositories/pay
 import { RazorpayGateway } from './infrastructure/gateways/razorpay.gateway';
 
 @Module({
-  imports: [CommonModule, CustomersModule],
+  imports: [CommonModule, CustomersModule, TrackingModule, NotificationsModule],
   providers: [
     PaymentService,
+    PaymentEventDispatcher,
     PaymentResolver,
     {
       provide: IPaymentRepository,
@@ -25,3 +29,5 @@ import { RazorpayGateway } from './infrastructure/gateways/razorpay.gateway';
   exports: [PaymentService],
 })
 export class PaymentsModule {}
+
+
