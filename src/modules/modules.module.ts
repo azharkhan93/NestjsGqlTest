@@ -11,6 +11,7 @@ import { CmsModule } from './cms';
 import { CustomersModule } from './customers/customers.module';
 import { TrackingModule } from './tracking/tracking.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     CustomersModule,
     TrackingModule,
     NotificationsModule,
+    PaymentsModule,
   ],
 })
 export class ModulesModule {}

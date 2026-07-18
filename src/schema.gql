@@ -217,6 +217,26 @@ type UserDeviceTokenType {
   createdAt: DateTime!
 }
 
+type Payment {
+  id: ID!
+  customerProfileId: String!
+  razorpayOrderId: String!
+  razorpayPaymentId: String
+  razorpaySignature: String
+  amount: Float!
+  currency: String!
+  status: PaymentStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Status of the payment"""
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
 type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
@@ -236,6 +256,7 @@ type Query {
   getCustomerAddresses(customerProfileId: ID!): [CustomerAddressType!]!
   driverLocation(bookingId: ID!): DriverLocationType
   getUserNotifications: [NotificationType!]!
+  getPaymentByOrderId(orderId: String!): Payment
 }
 
 type Mutation {
@@ -281,6 +302,8 @@ type Mutation {
   registerDeviceToken(input: RegisterDeviceTokenInput!): UserDeviceTokenType!
   markNotificationAsRead(id: ID!): NotificationType
   sendBookingNotification(bookingId: ID!, type: String!): Boolean!
+  createPayment(input: CreatePaymentInput!): Payment!
+  verifyPaymentSuccess(input: VerifyPaymentInput!): Payment!
 }
 
 input CreateVendorProfileInput {
@@ -438,6 +461,17 @@ input UpsertCustomerAddressInput {
 input RegisterDeviceTokenInput {
   fcmToken: String!
   deviceType: String!
+}
+
+input CreatePaymentInput {
+  customerProfileId: String!
+  amount: Float!
+}
+
+input VerifyPaymentInput {
+  razorpayOrderId: String!
+  razorpayPaymentId: String!
+  razorpaySignature: String!
 }
 
 type Subscription {

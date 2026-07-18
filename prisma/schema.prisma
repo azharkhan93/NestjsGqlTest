@@ -286,6 +286,7 @@ model CustomerProfile {
   email          String?
   location       String?
   addresses      CustomerAddress[]
+  payments       Payment[]
   createdAt      DateTime          @default(now()) @map("created_at")
   updatedAt      DateTime          @updatedAt @map("updated_at")
   deletedAt      DateTime?         @map("deleted_at")
@@ -335,6 +336,31 @@ model Notification {
 
   @@index([userId, isRead])
   @@map("notifications")
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model Payment {
+  id    String @id @default(uuid()) // @id:dynamic
+  customerProfileId String          @map("customer_profile_id")
+  customerProfile   CustomerProfile @relation(fields: [customerProfileId], references: [id])
+  razorpayOrderId   String          @unique @map("razorpay_order_id")
+  razorpayPaymentId String?         @unique @map("razorpay_payment_id")
+  razorpaySignature String?         @map("razorpay_signature")
+  amount            Float
+  currency          String          @default("INR")
+  status            PaymentStatus   @default(PENDING)
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
+
+  @@index([customerProfileId, deletedAt])
+  @@index([status, deletedAt])
+  @@map("payments")
 }
 
 
