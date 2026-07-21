@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 async function main(): Promise<void> {
   console.log('🌱 Starting database seeding...');
 
-  // 1. Seed Roles
   console.log('Seeding Roles...');
   const superAdminRole = await prisma.role.upsert({
     where: { name: UserRole.SUPER_ADMIN },
@@ -32,7 +31,7 @@ async function main(): Promise<void> {
   console.log('Seeding Super Admin...');
   const adminEmail = 'admin@example.com';
   const adminPasswordHash = await bcrypt.hash('admin123', 10);
-  
+
   await prisma.user.upsert({
     where: { email: adminEmail },
     update: {},
@@ -46,7 +45,7 @@ async function main(): Promise<void> {
 
   console.log('✅ Super Admin user seeded successfully');
 
-  // 3. Seed Service Categories
+ 
   console.log('Seeding Service Categories...');
   interface CategorySeed {
     name: string;
