@@ -4,9 +4,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { setupCors } from '@common/application/helpers';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(
+    helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }),
+  );
   app.use(cookieParser());
   app.use(graphqlUploadExpress({ maxFileSize: 5000000, maxFiles: 1 }));
   app.useGlobalPipes(new ValidationPipe());
