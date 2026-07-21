@@ -73,7 +73,20 @@ To prevent automated botnets from launching **SMS Pumping / Toll Fraud** attacks
 
 ---
 
-## 5. Database & Network Isolation (UFW & Loopback)
+## 5. Malicious File Upload Protection (Magic Byte Verification)
+
+To prevent attackers from uploading malicious `.php`, `.sh`, or `.exe` files renamed as images (e.g. `shell.php.jpg`):
+1. **Strict File Size Cap**: Maximum 5 MB per file (`MAX_SIZE = 5 * 1024 * 1024`).
+2. **MIME Type Whitelist**: Accepts only `image/jpeg`, `image/png`, `image/webp`, and `application/pdf`.
+3. **Magic Byte Signature Inspection**: `FileValidatorService` inspects the initial binary buffer bytes to verify actual file headers:
+   * JPEG: `[0xFF, 0xD8, 0xFF]`
+   * PNG: `[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]`
+   * PDF: `[0x25, 0x50, 0x44, 0x46]`
+4. **Cloudinary Off-Site Storage**: Uploaded files are streamed directly to Cloudinary CDN and never stored on the local VPS file system.
+
+---
+
+## 6. Database & Network Isolation (UFW & Loopback)
 
 ### Public Port Closure Policy
 To protect PostgreSQL (`5432`) and PgBouncer (`6432`) from internet brute-force attacks:
@@ -92,7 +105,7 @@ To protect PostgreSQL (`5432`) and PgBouncer (`6432`) from internet brute-force 
 
 ---
 
-## 6. API Hardening & Security Headers (Helmet, CORS, Validation)
+## 7. API Hardening & Security Headers (Helmet, CORS, Validation)
 
 ### Helmet HTTP Security Headers
 Configured in `src/main.ts` via `helmet`:
@@ -117,13 +130,16 @@ app.useGlobalPipes(
 
 ---
 
-## 7. Production Security Checklist
+## 8. Production Security Checklist
 
 - [x] Webhook signatures validated for Razorpay transactions
+- [x] Razorpay mutations guarded with `@Throttle` rate-limiting (max 5 per min)
 - [x] Sensitive card data processed off-site via PCI-DSS checkout
+- [x] Magic Byte binary file validation inspecting JPEG/PNG/PDF signatures (`FileValidatorService`)
+- [x] Off-site Cloudinary CDN file storage (Zero local disk storage)
 - [x] PASETO cryptographic tokens for session security
 - [x] Helmet HTTP security headers enabled
 - [x] PostgreSQL & PgBouncer ports (5432 & 6432) closed in UFW firewall
 - [x] NestJS `ValidationPipe` stripping non-whitelisted payload fields
-- [x] Rate limiting active via `@nestjs/throttler`
+- [x] Anti-Toll Fraud rate-limiting active on SMS OTP endpoints
 - [x] HTTPS TLS 1.3 encryption enabled via Caddy Server
