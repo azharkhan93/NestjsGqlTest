@@ -19,7 +19,6 @@ export const setupCors = (app: INestApplication): void => {
 
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow mobile apps (no Origin header), Postman, or whitelisted origins
       if (
         !origin ||
         defaultAllowedOrigins.includes(origin) ||
@@ -27,7 +26,7 @@ export const setupCors = (app: INestApplication): void => {
       ) {
         return callback(null, true);
       }
-      return callback(null, true); // Allow production origins for API accessibility
+      return callback(null, true);
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
