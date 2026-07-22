@@ -3,6 +3,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
+import depthLimit from 'graphql-depth-limit';
 import { ModulesModule } from './modules/modules.module';
 import { PrismaModule } from './common/infrastructure/persistence/prisma/prisma.module';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -18,6 +19,7 @@ import { GqlThrottlerGuard } from './common/presentation/guards';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       context: ({ req, res }) => ({ req, res }),
+      validationRules: [depthLimit(5)],
       subscriptions: {
         'graphql-ws': true,
       },
