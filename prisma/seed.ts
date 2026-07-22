@@ -45,7 +45,6 @@ async function main(): Promise<void> {
 
   console.log('✅ Super Admin user seeded successfully');
 
- 
   console.log('Seeding Service Categories...');
   interface CategorySeed {
     name: string;
