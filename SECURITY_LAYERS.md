@@ -123,7 +123,7 @@ To prevent automated bots from executing **SMS Pumping / Toll Fraud** attacks:
 * **E.164 Validation**: Phone numbers are validated against standard international E.164 formats (`+15076097946`).
 * **Strict OTP Throttling**:
   ```typescript
-  @Throttle({ default: { ttl: 900000, limit: 3 } }) // Max 3 OTP SMS requests per 15 minutes
+  @Throttle({ default: { ttl: 900000, limit: 3 } }) 
   @Mutation(() => SmsResponseType, { name: 'requestOtp' })
   ```
 
