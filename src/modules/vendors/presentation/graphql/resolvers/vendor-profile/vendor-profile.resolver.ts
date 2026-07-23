@@ -10,7 +10,6 @@ import {
 } from '@modules/vendors/presentation/graphql/inputs';
 
 @Resolver(() => VendorProfileType)
-@UseGuards(GqlAuthGuard)
 export class VendorProfileResolver {
   constructor(private readonly service: VendorProfileService) {}
 
@@ -30,15 +29,17 @@ export class VendorProfileResolver {
   }
 
   @Mutation(() => VendorProfileType)
+  @UseGuards(GqlAuthGuard)
   async createVendorProfile(
     @Args('input') input: CreateVendorProfileInput,
     @CurrentUser() user: any,
   ) {
-    input.userId = input.userId || user.sub;
+    input.userId = input.userId || user?.sub || user?.id;
     return this.service.createOrUpdate(input);
   }
 
   @Mutation(() => VendorProfileType)
+  @UseGuards(GqlAuthGuard)
   async updateVendorProfile(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateVendorProfileInput,
@@ -52,6 +53,7 @@ export class VendorProfileResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
   async deleteVendorProfile(@Args('id', { type: () => ID }) id: string) {
     return this.service.delete(id);
   }
