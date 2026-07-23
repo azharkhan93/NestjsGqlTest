@@ -1,6 +1,8 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { VendorServiceService } from '@modules/vendors/vendor-services/application/services';
 import { VendorServiceType } from '@modules/vendors/vendor-services/presentation/graphql/types';
+import { GqlAuthGuard } from '@common/presentation/guards/index';
 import {
   CreateVendorServiceInput,
   UpdateVendorServiceInput,
@@ -25,6 +27,7 @@ export class VendorServiceResolver {
   }
 
   @Mutation(() => VendorServiceType)
+  @UseGuards(GqlAuthGuard)
   async createVendorService(
     @Args('input') input: CreateVendorServiceInput,
   ): Promise<VendorServiceType> {
@@ -32,6 +35,7 @@ export class VendorServiceResolver {
   }
 
   @Mutation(() => VendorServiceType)
+  @UseGuards(GqlAuthGuard)
   async updateVendorService(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateVendorServiceInput,
@@ -40,6 +44,7 @@ export class VendorServiceResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
   async deleteVendorService(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
