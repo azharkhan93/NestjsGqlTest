@@ -12,6 +12,9 @@ import { CustomersModule } from './customers/customers.module';
 import { TrackingModule } from './tracking/tracking.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentsModule } from './payments/payments.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { DisputesModule } from './disputes/disputes.module';
 
 @Module({
   imports: [
@@ -27,6 +30,9 @@ import { PaymentsModule } from './payments/payments.module';
     TrackingModule,
     NotificationsModule,
     PaymentsModule,
+    BookingsModule,
+    ReviewsModule,
+    DisputesModule,
   ],
 })
 export class ModulesModule {}

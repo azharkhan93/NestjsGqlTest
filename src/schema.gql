@@ -237,6 +237,47 @@ enum PaymentStatus {
   FAILED
 }
 
+type Booking {
+  id: ID!
+  userId: String!
+  user: UserType
+  serviceId: String!
+  service: VendorService
+  vendorProfile: VendorProfileType
+  status: BookingStatus!
+  scheduledAt: DateTime!
+  totalPrice: Float
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Status of the booking"""
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+type Review {
+  id: ID!
+  bookingId: ID!
+  rating: Int!
+  comment: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Dispute {
+  id: ID!
+  bookingId: ID!
+  reason: String!
+  status: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
@@ -257,6 +298,12 @@ type Query {
   driverLocation(bookingId: ID!): DriverLocationType
   getUserNotifications: [NotificationType!]!
   getPaymentByOrderId(orderId: String!): Payment
+  customerBookings(userId: ID!, status: BookingStatus): [Booking!]!
+  vendorBookings(vendorProfileId: ID!, status: BookingStatus): [Booking!]!
+  bookingById(id: ID!): Booking!
+  reviewByBookingId(bookingId: ID!): Review
+  vendorReviews(vendorProfileId: ID!): [Review!]!
+  disputeByBookingId(bookingId: ID!): Dispute
 }
 
 type Mutation {
@@ -304,6 +351,10 @@ type Mutation {
   sendBookingNotification(bookingId: ID!, type: String!): Boolean!
   createPayment(input: CreatePaymentInput!): Payment!
   verifyPaymentSuccess(input: VerifyPaymentInput!): Payment!
+  createBooking(input: CreateBookingInput!): Booking!
+  updateBookingStatus(id: ID!, status: BookingStatus!): Booking!
+  createReview(input: CreateReviewInput!): Review!
+  createDispute(input: CreateDisputeInput!): Dispute!
 }
 
 input CreateVendorProfileInput {
@@ -472,6 +523,23 @@ input VerifyPaymentInput {
   razorpayOrderId: String!
   razorpayPaymentId: String!
   razorpaySignature: String!
+}
+
+input CreateBookingInput {
+  userId: ID!
+  serviceId: ID!
+  scheduledAt: DateTime!
+}
+
+input CreateReviewInput {
+  bookingId: ID!
+  rating: Int!
+  comment: String
+}
+
+input CreateDisputeInput {
+  bookingId: ID!
+  reason: String!
 }
 
 type Subscription {

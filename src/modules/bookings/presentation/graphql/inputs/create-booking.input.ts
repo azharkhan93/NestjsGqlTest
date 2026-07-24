@@ -1,10 +1,13 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, ID } from '@nestjs/graphql';
 
 @InputType()
 export class CreateBookingInput {
-  @Field()
+  @Field(() => ID)
+  userId: string;
+
+  @Field(() => ID)
   serviceId: string;
 
   @Field()
-  scheduledAt: string;
+  scheduledAt: Date;
 }
