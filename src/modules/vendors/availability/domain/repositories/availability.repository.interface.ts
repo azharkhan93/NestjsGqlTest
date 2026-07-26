@@ -14,7 +14,7 @@ export abstract class IAvailabilityRepository {
   abstract upsertSchedule(
     vendorProfileId: string,
     schedule: Partial<VendorAvailabilityEntity>[],
-    tx?: any,
+    tx?: unknown,
   ): Promise<void>;
   abstract updateScheduleItem(
     id: string,
@@ -23,12 +23,12 @@ export abstract class IAvailabilityRepository {
   abstract syncBreaks(
     vendorProfileId: string,
     breaks: Partial<VendorBreakEntity>[],
-    tx?: any,
+    tx?: unknown,
   ): Promise<void>;
   abstract syncExceptions(
     vendorProfileId: string,
     exceptions: Partial<VendorExceptionEntity>[],
-    tx?: any,
+    tx?: unknown,
   ): Promise<void>;
 
   abstract addBreak(
@@ -39,6 +39,11 @@ export abstract class IAvailabilityRepository {
     id: string,
     data: Partial<VendorBreakEntity>,
   ): Promise<VendorBreakEntity>;
+  abstract getVendorProfileIdForAvailabilityItem(
+    type: 'vendorAvailability' | 'vendorBreak' | 'vendorException',
+    id: string,
+  ): Promise<string | null>;
+
   abstract removeBreak(id: string): Promise<void>;
   abstract addException(
     vendorProfileId: string,

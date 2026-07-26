@@ -4,6 +4,7 @@ import { VendorProfileService } from '@modules/vendors/application/services';
 import { VendorProfileType } from '@modules/vendors/presentation/graphql/types';
 import { GqlAuthGuard } from '@common/presentation/guards/index';
 import { CurrentUser } from '@common/presentation/decorators/index';
+import { CurrentUserPayload } from '@common/domain/interfaces';
 import {
   CreateVendorProfileInput,
   UpdateVendorProfileInput,
@@ -32,7 +33,7 @@ export class VendorProfileResolver {
   @UseGuards(GqlAuthGuard)
   async createVendorProfile(
     @Args('input') input: CreateVendorProfileInput,
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
   ) {
     input.userId = input.userId || user?.sub || user?.id;
     return this.service.createOrUpdate(input);

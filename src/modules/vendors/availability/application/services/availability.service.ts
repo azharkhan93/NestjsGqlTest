@@ -1,5 +1,4 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '@common/infrastructure/persistence';
 import { UserRole } from '@common/domain/enums';
 import { VendorProfileService } from '@modules/vendors/application/services/vendor-profile';
 import { IAvailabilityRepository } from '@modules/vendors/availability/domain/repositories';
@@ -9,36 +8,44 @@ import {
   VendorExceptionEntity,
 } from '@modules/vendors/availability/domain/entities';
 
+export interface AuthenticatedUserPayload {
+  sub: string;
+  role?: string | { name?: string };
+  email?: string;
+}
+
+export interface SaveFullAvailabilityInput {
+  schedule?: Partial<VendorAvailabilityEntity>[];
+  breaks?: Partial<VendorBreakEntity>[];
+  exceptions?: Partial<VendorExceptionEntity>[];
+}
+
 @Injectable()
 export class AvailabilityService {
   constructor(
     private readonly repository: IAvailabilityRepository,
-    private readonly prisma: PrismaService,
     private readonly vendorProfileService: VendorProfileService,
   ) {}
 
   private async validate(
-    user: any,
+    user: AuthenticatedUserPayload,
     vendorId?: string,
     item?: {
       type: 'vendorAvailability' | 'vendorBreak' | 'vendorException';
       id: string;
     },
-  ) {
+  ): Promise<void> {
     const userRole =
       typeof user.role === 'string' ? user.role : user.role?.name;
     if (userRole === UserRole.SUPER_ADMIN) return;
 
-    // const userRole = typeof user.role === 'string' ? user.role : user.role?.name;
-    // if (userRole === UserRole.SUPER_ADMIN) return;
-
     let targetId = vendorId;
     if (item) {
-      const record = await (this.prisma[item.type] as any).findUnique({
-        where: { id: item.id },
-        select: { vendorProfileId: true },
-      });
-      targetId = record?.vendorProfileId;
+      targetId =
+        (await this.repository.getVendorProfileIdForAvailabilityItem(
+          item.type,
+          item.id,
+        )) ?? undefined;
     }
 
     const profile = await this.vendorProfileService.findByUserId(user.sub);
@@ -49,36 +56,53 @@ export class AvailabilityService {
     }
   }
 
-  async getAvailability(user: any, vendorId: string) {
+  async getAvailability(
+    user: AuthenticatedUserPayload,
+    vendorId: string,
+  ): Promise<{
+    schedule: VendorAvailabilityEntity[];
+    breaks: VendorBreakEntity[];
+    exceptions: VendorExceptionEntity[];
+  }> {
     await this.validate(user, vendorId);
     return this.repository.getVendorAvailability(vendorId);
   }
 
-  async saveFullAvailability(user: any, vendorId: string, input: any) {
+  async saveFullAvailability(
+    user: AuthenticatedUserPayload,
+    vendorId: string,
+    input: SaveFullAvailabilityInput,
+  ): Promise<{
+    schedule: VendorAvailabilityEntity[];
+    breaks: VendorBreakEntity[];
+    exceptions: VendorExceptionEntity[];
+  }> {
     await this.validate(user, vendorId);
-    return this.prisma.$transaction(async (tx) => {
-      await this.repository.upsertSchedule(vendorId, input.schedule, tx);
-      await this.repository.syncBreaks(vendorId, input.breaks, tx);
-      await this.repository.syncExceptions(vendorId, input.exceptions, tx);
-      return this.repository.getVendorAvailability(vendorId);
-    });
+    await this.repository.upsertSchedule(vendorId, input.schedule ?? []);
+    await this.repository.syncBreaks(vendorId, input.breaks ?? []);
+    await this.repository.syncExceptions(vendorId, input.exceptions ?? []);
+    return this.repository.getVendorAvailability(vendorId);
   }
 
   async updateSchedule(
-    user: any,
+    user: AuthenticatedUserPayload,
     vendorId: string,
     schedule: Partial<VendorAvailabilityEntity>[],
-  ) {
+  ): Promise<{
+    schedule: VendorAvailabilityEntity[];
+    breaks: VendorBreakEntity[];
+    exceptions: VendorExceptionEntity[];
+  }> {
     await this.validate(user, vendorId);
     await this.repository.upsertSchedule(vendorId, schedule);
     return this.repository.getVendorAvailability(vendorId);
   }
 
   async updateScheduleItem(
-    user: any,
+    user: AuthenticatedUserPayload,
     id: string,
     data: Partial<VendorAvailabilityEntity>,
-  ) {
+  ): Promise<VendorAvailabilityEntity> {
     await this.validate(user, undefined, { type: 'vendorAvailability', id });
     return this.repository.updateScheduleItem(id, data);
   }
@@ -86,20 +110,27 @@ export class AvailabilityService {
   // --- Breaks ---
 
   async addBreak(
-    user: any,
+    user: AuthenticatedUserPayload,
     vendorId: string,
     data: Partial<VendorBreakEntity>,
-  ) {
+  ): Promise<VendorBreakEntity> {
     await this.validate(user, vendorId);
     return this.repository.addBreak(vendorId, data);
   }
 
-  async updateBreak(user: any, id: string, data: Partial<VendorBreakEntity>) {
+  async updateBreak(
+    user: AuthenticatedUserPayload,
+    id: string,
+    data: Partial<VendorBreakEntity>,
+  ): Promise<VendorBreakEntity> {
     await this.validate(user, undefined, { type: 'vendorBreak', id });
     return this.repository.updateBreak(id, data);
   }
 
-  async removeBreak(user: any, id: string) {
+  async removeBreak(
+    user: AuthenticatedUserPayload,
+    id: string,
+  ): Promise<boolean> {
     await this.validate(user, undefined, { type: 'vendorBreak', id });
     return this.repository.removeBreak(id).then(() => true);
   }
@@ -107,24 +138,27 @@ export class AvailabilityService {
   // --- Exceptions ---
 
   async addException(
-    user: any,
+    user: AuthenticatedUserPayload,
     vendorId: string,
     data: Partial<VendorExceptionEntity>,
-  ) {
+  ): Promise<VendorExceptionEntity> {
     await this.validate(user, vendorId);
     return this.repository.addException(vendorId, data);
   }
 
   async updateException(
-    user: any,
+    user: AuthenticatedUserPayload,
     id: string,
     data: Partial<VendorExceptionEntity>,
-  ) {
+  ): Promise<VendorExceptionEntity> {
     await this.validate(user, undefined, { type: 'vendorException', id });
     return this.repository.updateException(id, data);
   }
 
-  async removeException(user: any, id: string) {
+  async removeException(
+    user: AuthenticatedUserPayload,
+    id: string,
+  ): Promise<boolean> {
     await this.validate(user, undefined, { type: 'vendorException', id });
     return this.repository.removeException(id).then(() => true);
   }

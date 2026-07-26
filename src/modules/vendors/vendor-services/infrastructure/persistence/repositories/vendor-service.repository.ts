@@ -5,7 +5,14 @@ import {
 } from '@common/infrastructure/persistence';
 import { VendorServiceEntity } from '@modules/vendors/vendor-services/domain/entities';
 import { IVendorServiceRepository } from '@modules/vendors/vendor-services/domain/repositories';
-import { Service as PrismaServiceType } from '@prisma/client';
+import {
+  Service as PrismaServiceType,
+  ServicePricing as PrismaServicePricing,
+} from '@prisma/client';
+
+export type PrismaVendorServiceWithPricings = PrismaServiceType & {
+  pricings?: PrismaServicePricing[];
+};
 
 @Injectable()
 export class VendorServiceRepository
@@ -84,14 +91,14 @@ export class VendorServiceRepository
     return result ? this.toEntity(result) : null;
   }
 
-  toEntity(model: any): VendorServiceEntity {
+  toEntity(model: PrismaVendorServiceWithPricings): VendorServiceEntity {
     return new VendorServiceEntity({
       ...model,
       deletedAt: model.deletedAt ?? undefined,
       availableAtHome: model.availableAtHome,
       availableAtCenter: model.availableAtCenter,
       pricings: model.pricings
-        ? model.pricings.map((p: any) => ({
+        ? model.pricings.map((p: PrismaServicePricing) => ({
             categoryId: p.categoryId,
             price: p.price,
           }))

@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/infrastructure/persistence';
+import { IDisputeRepository } from '../../domain/repositories/dispute.repository.interface';
+import { DisputeEntity } from '../../domain/entities/dispute.entity';
 import { CreateDisputeInput } from '../../presentation/graphql/inputs/create-dispute.input';
 
 @Injectable()
 export class DisputesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly disputeRepository: IDisputeRepository) {}
 
-  async createDispute(input: CreateDisputeInput) {
-    return this.prisma.dispute.create({
-      data: {
-        bookingId: input.bookingId,
-        reason: input.reason,
-        status: 'OPEN',
-      },
+  async createDispute(input: CreateDisputeInput): Promise<DisputeEntity> {
+    const dispute = DisputeEntity.create({
+      bookingId: input.bookingId,
+      reason: input.reason,
+      status: 'OPEN',
     });
+    return this.disputeRepository.create(dispute);
   }
 
-  async getDisputeByBookingId(bookingId: string) {
-    return this.prisma.dispute.findUnique({
-      where: { bookingId },
-    });
+  async getDisputeByBookingId(
+    bookingId: string,
+  ): Promise<DisputeEntity | null> {
+    return this.disputeRepository.findByBookingId(bookingId);
   }
 }

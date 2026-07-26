@@ -3,6 +3,7 @@ import { UseGuards } from '@nestjs/common';
 import { AvailabilityService } from '@modules/vendors/availability/application/services';
 import { GqlAuthGuard, RolesGuard } from '@common/presentation/guards/index';
 import { Roles, CurrentUser } from '@common/presentation/decorators/index';
+import { CurrentUserPayload } from '@common/domain/interfaces';
 import { UserRole } from '@common/domain/enums';
 import {
   VendorAvailabilityResponse,
@@ -25,7 +26,7 @@ export class AvailabilityResolver {
 
   @Query(() => VendorAvailabilityResponse)
   async getVendorAvailability(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
   ) {
     return this.service.getAvailability(user, vendorProfileId);
@@ -33,7 +34,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => VendorAvailabilityResponse)
   async updateVendorSchedule(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @Args('schedule', { type: () => [UpdateScheduleInput] })
     schedule: UpdateScheduleInput[],
@@ -43,7 +44,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => VendorScheduleType)
   async updateVendorScheduleItem(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateScheduleInput,
   ) {
@@ -52,7 +53,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => VendorAvailabilityResponse)
   async saveFullAvailability(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @Args('input') input: SaveAvailabilityInput,
   ) {
@@ -61,7 +62,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => VendorBreakType)
   async addVendorBreak(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @Args('input') input: CreateBreakInput,
   ) {
@@ -70,7 +71,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => VendorBreakType)
   async updateVendorBreak(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateBreakInput,
   ) {
@@ -79,7 +80,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => Boolean)
   async removeVendorBreak(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('id', { type: () => ID }) id: string,
   ) {
     return this.service.removeBreak(user, id);
@@ -87,7 +88,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => VendorExceptionType)
   async addVendorException(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @Args('input') input: CreateExceptionInput,
   ) {
@@ -96,7 +97,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => VendorExceptionType)
   async updateVendorException(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateExceptionInput,
   ) {
@@ -105,7 +106,7 @@ export class AvailabilityResolver {
 
   @Mutation(() => Boolean)
   async removeVendorException(
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
     @Args('id', { type: () => ID }) id: string,
   ) {
     return this.service.removeException(user, id);

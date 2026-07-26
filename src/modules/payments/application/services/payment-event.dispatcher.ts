@@ -3,6 +3,7 @@ import { CustomerProfileService } from '@modules/customers/application/services/
 import { TrackingService } from '@modules/tracking/application/services/tracking.service';
 import { NotificationService } from '@modules/notifications/application/services/notification.service';
 import { PrismaService } from '@common/infrastructure/persistence';
+import { BookingStatus } from '@prisma/client';
 
 @Injectable()
 export class PaymentEventDispatcher {
@@ -30,7 +31,7 @@ export class PaymentEventDispatcher {
           const latestBooking = await this.prisma.booking.findFirst({
             where: {
               userId: profile.userId,
-              status: 'PENDING',
+              status: BookingStatus.PENDING,
             },
             orderBy: {
               createdAt: 'desc',
@@ -41,7 +42,7 @@ export class PaymentEventDispatcher {
             bookingId = latestBooking.id;
             await this.prisma.booking.update({
               where: { id: bookingId },
-              data: { status: 'CONFIRMED' as any },
+              data: { status: BookingStatus.CONFIRMED },
             });
             this.logger.log(
               `Successfully confirmed Booking ${bookingId} for successful Payment ${paymentId}`,
@@ -52,9 +53,10 @@ export class PaymentEventDispatcher {
             );
           }
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         this.logger.error(
-          `Failed to update booking status for payment ${paymentId}: ${err.message}`,
+          `Failed to update booking status for payment ${paymentId}: ${message}`,
         );
       }
 
@@ -70,9 +72,10 @@ export class PaymentEventDispatcher {
         this.logger.log(
           `Driver assignment logic updated successfully for Booking ${bookingId}`,
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         this.logger.error(
-          `Failed to update driver assignment tracker for Booking ${bookingId}: ${err.message}`,
+          `Failed to update driver assignment tracker for Booking ${bookingId}: ${message}`,
         );
       }
 
@@ -98,9 +101,10 @@ export class PaymentEventDispatcher {
             `No active device tokens registered for user ${userId}, push notification skipped`,
           );
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         this.logger.error(
-          `Firebase/FCM Push Notification failed (third-party service down/network issue): ${err.message}. System transaction remains safe.`,
+          `Firebase/FCM Push Notification failed (third-party service down/network issue): ${message}. System transaction remains safe.`,
         );
       }
     });

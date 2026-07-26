@@ -8,6 +8,7 @@ import {
 import { RegisterDeviceTokenInput } from '@modules/notifications/presentation/graphql/inputs';
 import { GqlAuthGuard } from '@common/presentation/guards/index';
 import { CurrentUser } from '@common/presentation/decorators/index';
+import { CurrentUserPayload } from '@common/domain/interfaces';
 
 @Resolver()
 export class NotificationResolver {
@@ -17,7 +18,7 @@ export class NotificationResolver {
   @UseGuards(GqlAuthGuard)
   async registerDeviceToken(
     @Args('input') input: RegisterDeviceTokenInput,
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.service.registerDeviceToken(
       user.sub,
@@ -28,7 +29,7 @@ export class NotificationResolver {
 
   @Query(() => [NotificationType], { name: 'getUserNotifications' })
   @UseGuards(GqlAuthGuard)
-  async getUserNotifications(@CurrentUser() user: any) {
+  async getUserNotifications(@CurrentUser() user: CurrentUserPayload) {
     return this.service.getUserNotifications(user.sub);
   }
 

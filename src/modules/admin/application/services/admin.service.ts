@@ -3,6 +3,7 @@ import {
   OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { IUserRepository } from '@modules/users/domain/repositories/user.repository.interface';
 import { RolesService } from '@modules/roles/application/services/roles.service';
@@ -16,14 +17,32 @@ export class AdminService implements OnModuleInit {
     private readonly userRepository: IUserRepository,
     private readonly rolesService: RolesService,
     private readonly pasetoService: PasetoService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     await this.seedSuperAdmin();
   }
 
-  async seedSuperAdmin() {
-    const adminEmail = 'admin@example.com';
+  async seedSuperAdmin(): Promise<void> {
+    const shouldSeed =
+      this.configService.get<string>('SEED_SUPER_ADMIN') === 'true';
+    if (!shouldSeed) {
+      return;
+    }
+
+    const adminEmail = this.configService.get<string>('SUPER_ADMIN_EMAIL');
+    const adminPassword = this.configService.get<string>(
+      'SUPER_ADMIN_PASSWORD',
+    );
+
+    if (!adminEmail || !adminPassword) {
+      console.warn(
+        '⚠️ SEED_SUPER_ADMIN is true, but SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD is missing in environment. Aborting super admin seeding.',
+      );
+      return;
+    }
+
     const existingAdmin = await this.userRepository.findByEmail(adminEmail);
 
     if (existingAdmin) {
@@ -33,7 +52,7 @@ export class AdminService implements OnModuleInit {
 
     try {
       const role = await this.rolesService.create(UserRole.SUPER_ADMIN);
-      const hashedPassword = await bcrypt.hash('admin123', 10);
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
       await this.userRepository.create(
         UserEntity.create({
@@ -46,7 +65,9 @@ export class AdminService implements OnModuleInit {
 
       console.log('🚀 Super Admin seeded successfully');
     } catch (error) {
-      console.error('❌ Failed to seed Super Admin:', error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error('❌ Failed to seed Super Admin:', errorMessage);
     }
   }
 

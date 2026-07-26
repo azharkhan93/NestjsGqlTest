@@ -4,7 +4,10 @@ import {
   PrismaService,
 } from '@common/infrastructure/persistence';
 import { VendorProfileEntity } from '@modules/vendors/domain/entities';
-import { VendorProfile as PrismaVendorProfile } from '@prisma/client';
+import {
+  VendorProfile as PrismaVendorProfile,
+  ServiceCategory as PrismaServiceCategory,
+} from '@prisma/client';
 import { IVendorProfileRepository } from '@modules/vendors/domain/repositories';
 
 @Injectable()
@@ -95,7 +98,7 @@ export class VendorProfileRepository
   }
 
   toEntity(
-    model: PrismaVendorProfile & { categories?: any[] },
+    model: PrismaVendorProfile & { categories?: PrismaServiceCategory[] },
   ): VendorProfileEntity {
     return new VendorProfileEntity({
       ...model,

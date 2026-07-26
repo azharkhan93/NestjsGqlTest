@@ -217,26 +217,6 @@ type UserDeviceTokenType {
   createdAt: DateTime!
 }
 
-type Payment {
-  id: ID!
-  customerProfileId: String!
-  razorpayOrderId: String!
-  razorpayPaymentId: String
-  razorpaySignature: String
-  amount: Float!
-  currency: String!
-  status: PaymentStatus!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-"""Status of the payment"""
-enum PaymentStatus {
-  PENDING
-  SUCCESS
-  FAILED
-}
-
 type Booking {
   id: ID!
   userId: String!
@@ -258,6 +238,26 @@ enum BookingStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+type Payment {
+  id: ID!
+  customerProfileId: String!
+  razorpayOrderId: String!
+  razorpayPaymentId: String
+  razorpaySignature: String
+  amount: Float!
+  currency: String!
+  status: PaymentStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Status of the payment"""
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }
 
 type Review {
@@ -297,10 +297,10 @@ type Query {
   getCustomerAddresses(customerProfileId: ID!): [CustomerAddressType!]!
   driverLocation(bookingId: ID!): DriverLocationType
   getUserNotifications: [NotificationType!]!
-  getPaymentByOrderId(orderId: String!): Payment
   customerBookings(userId: ID!, status: BookingStatus): [Booking!]!
   vendorBookings(vendorProfileId: ID!, status: BookingStatus): [Booking!]!
   bookingById(id: ID!): Booking!
+  getPaymentByOrderId(orderId: String!): Payment
   reviewByBookingId(bookingId: ID!): Review
   vendorReviews(vendorProfileId: ID!): [Review!]!
   disputeByBookingId(bookingId: ID!): Dispute
@@ -349,10 +349,10 @@ type Mutation {
   registerDeviceToken(input: RegisterDeviceTokenInput!): UserDeviceTokenType!
   markNotificationAsRead(id: ID!): NotificationType
   sendBookingNotification(bookingId: ID!, type: String!): Boolean!
-  createPayment(input: CreatePaymentInput!): Payment!
-  verifyPaymentSuccess(input: VerifyPaymentInput!): Payment!
   createBooking(input: CreateBookingInput!): Booking!
   updateBookingStatus(id: ID!, status: BookingStatus!): Booking!
+  createPayment(input: CreatePaymentInput!): Payment!
+  verifyPaymentSuccess(input: VerifyPaymentInput!): Payment!
   createReview(input: CreateReviewInput!): Review!
   createDispute(input: CreateDisputeInput!): Dispute!
 }
@@ -514,6 +514,12 @@ input RegisterDeviceTokenInput {
   deviceType: String!
 }
 
+input CreateBookingInput {
+  userId: ID!
+  serviceId: ID!
+  scheduledAt: DateTime!
+}
+
 input CreatePaymentInput {
   customerProfileId: String!
   amount: Float!
@@ -523,12 +529,6 @@ input VerifyPaymentInput {
   razorpayOrderId: String!
   razorpayPaymentId: String!
   razorpaySignature: String!
-}
-
-input CreateBookingInput {
-  userId: ID!
-  serviceId: ID!
-  scheduledAt: DateTime!
 }
 
 input CreateReviewInput {

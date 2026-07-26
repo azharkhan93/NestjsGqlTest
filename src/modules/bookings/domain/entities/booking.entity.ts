@@ -1,4 +1,7 @@
 import { BaseEntity } from '@common/domain/entities';
+import { UserEntity } from '@modules/users/domain/entities/user.entity';
+import { VendorServiceEntity } from '@modules/vendors/vendor-services/domain/entities/vendor-service.entity';
+import { VendorProfileEntity } from '@modules/vendors/domain/entities/vendor-profile/vendor-profile.entity';
 
 export enum BookingStatus {
   PENDING = 'PENDING',
@@ -13,6 +16,10 @@ export class BookingEntity extends BaseEntity {
   serviceId: string;
   status: BookingStatus;
   scheduledAt: Date;
+  service?: VendorServiceEntity;
+  user?: UserEntity;
+  vendorProfile?: VendorProfileEntity;
+  totalPrice?: number;
   deletedAt?: Date;
 
   constructor(partial: Partial<BookingEntity>) {

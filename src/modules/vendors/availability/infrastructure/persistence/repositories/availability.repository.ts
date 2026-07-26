@@ -12,8 +12,8 @@ import { IAvailabilityRepository } from '@modules/vendors/availability/domain/re
 export class AvailabilityRepository implements IAvailabilityRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  private getClient(tx?: any) {
-    return tx || this.prisma;
+  private getClient(tx?: unknown) {
+    return (tx as PrismaService) || this.prisma;
   }
 
   async getVendorAvailability(vendorProfileId: string) {
@@ -45,7 +45,7 @@ export class AvailabilityRepository implements IAvailabilityRepository {
   async upsertSchedule(
     vendorProfileId: string,
     schedule: Partial<VendorAvailabilityEntity>[],
-    tx?: any,
+    tx?: unknown,
   ): Promise<void> {
     const client = this.getClient(tx);
     await Promise.all(
@@ -92,7 +92,7 @@ export class AvailabilityRepository implements IAvailabilityRepository {
   async syncBreaks(
     vendorProfileId: string,
     breaks: Partial<VendorBreakEntity>[],
-    tx?: any,
+    tx?: unknown,
   ): Promise<void> {
     const client = this.getClient(tx);
     await client.vendorBreak.deleteMany({ where: { vendorProfileId } });
@@ -111,7 +111,7 @@ export class AvailabilityRepository implements IAvailabilityRepository {
   async syncExceptions(
     vendorProfileId: string,
     exceptions: Partial<VendorExceptionEntity>[],
-    tx?: any,
+    tx?: unknown,
   ): Promise<void> {
     const client = this.getClient(tx);
     await client.vendorException.deleteMany({ where: { vendorProfileId } });
@@ -191,6 +191,42 @@ export class AvailabilityRepository implements IAvailabilityRepository {
     return new VendorExceptionEntity({
       ...result,
       type: result.type as ExceptionType,
+    });
+  }
+
+  async getVendorProfileIdForAvailabilityItem(
+    type: 'vendorAvailability' | 'vendorBreak' | 'vendorException',
+    id: string,
+  ): Promise<string | null> {
+    if (type === 'vendorAvailability') {
+      const record = await this.prisma.vendorAvailability.findUnique({
+        where: { id },
+        select: { vendorProfileId: true },
+      });
+      return record?.vendorProfileId ?? null;
+    }
+    if (type === 'vendorBreak') {
+      const record = await this.prisma.vendorBreak.findUnique({
+        where: { id },
+        select: { vendorProfileId: true },
+      });
+      return record?.vendorProfileId ?? null;
+    }
+    if (type === 'vendorException') {
+      const record = await this.prisma.vendorException.findUnique({
+        where: { id },
+        select: { vendorProfileId: true },
+      });
+      return record?.vendorProfileId ?? null;
+    }
+    return null;
+  }
+
+  async runTransaction<T>(
+    fn: (repo: IAvailabilityRepository, tx: unknown) => Promise<T>,
+  ): Promise<T> {
+    return this.prisma.$transaction(async (tx) => {
+      return fn(this, tx);
     });
   }
 

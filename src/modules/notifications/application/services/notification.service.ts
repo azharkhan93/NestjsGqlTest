@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '@common/infrastructure/persistence';
 import {
   IUserDeviceTokenRepository,
   INotificationRepository,
@@ -9,6 +8,7 @@ import {
   NotificationEntity,
 } from '../../domain/entities';
 import { FcmService } from '../../infrastructure/services/fcm.service';
+import { BookingService } from '@modules/bookings/application/services/booking.service';
 
 @Injectable()
 export class NotificationService {
@@ -16,7 +16,7 @@ export class NotificationService {
     private readonly userDeviceTokenRepo: IUserDeviceTokenRepository,
     private readonly notificationRepo: INotificationRepository,
     private readonly fcmService: FcmService,
-    private readonly prisma: PrismaService,
+    private readonly bookingService: BookingService,
   ) {}
 
   async registerDeviceToken(
@@ -69,25 +69,14 @@ export class NotificationService {
     bookingId: string,
     type: 'JOURNEY_START' | 'JOURNEY_HALFWAY',
   ): Promise<boolean> {
-    // Fetch the booking with relations to find customer user ID and vendor profile name
-    const booking = await this.prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: {
-        service: {
-          include: {
-            vendorProfile: true,
-          },
-        },
-      },
-    });
+    const booking = await this.bookingService.getBookingById(bookingId);
 
     if (!booking) {
       throw new NotFoundException(`Booking with ID ${bookingId} not found.`);
     }
 
     const customerUserId = booking.userId;
-    const vendorName =
-      booking.service?.vendorProfile?.businessName ?? 'Your Vendor';
+    const vendorName = booking.vendorProfile?.businessName ?? 'Your Vendor';
 
     let title = '';
     let body = '';

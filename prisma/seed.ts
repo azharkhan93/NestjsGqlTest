@@ -27,23 +27,31 @@ async function main(): Promise<void> {
 
   console.log('✅ Roles seeded successfully');
 
-  // 2. Seed Super Admin User
+
   console.log('Seeding Super Admin...');
-  const adminEmail = 'admin@example.com';
-  const adminPasswordHash = await bcrypt.hash('admin123', 10);
+  const adminEmail = process.env.SUPER_ADMIN_EMAIL;
+  const adminPassword = process.env.SUPER_ADMIN_PASSWORD;
 
-  await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      name: 'Super Admin',
-      password: adminPasswordHash,
-      roleId: superAdminRole.id,
-    },
-  });
+  if (adminEmail && adminPassword) {
+    const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
 
-  console.log('✅ Super Admin user seeded successfully');
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: {},
+      create: {
+        email: adminEmail,
+        name: 'Super Admin',
+        password: adminPasswordHash,
+        roleId: superAdminRole.id,
+      },
+    });
+
+    console.log('✅ Super Admin user seeded successfully');
+  } else {
+    console.log(
+      '⚠️ SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD not set in environment. Skipping Super Admin user seeding.',
+    );
+  }
 
   console.log('Seeding Service Categories...');
   interface CategorySeed {

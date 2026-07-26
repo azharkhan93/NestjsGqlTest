@@ -5,6 +5,8 @@ import { CustomerProfileType } from '../types/customer-profile.type';
 import { UpsertCustomerProfileInput } from '../inputs/upsert-customer-profile.input';
 import { GqlAuthGuard } from '@common/presentation/guards/index';
 import { CurrentUser } from '@common/presentation/decorators/index';
+import { CurrentUserPayload } from '@common/domain/interfaces';
+import { CustomerProfileEntity } from '../../../domain/entities/customer-profile.entity';
 
 @Resolver(() => CustomerProfileType)
 @UseGuards(GqlAuthGuard)
@@ -14,17 +16,17 @@ export class CustomerProfileResolver {
   @Query(() => CustomerProfileType, { nullable: true })
   async getCustomerProfile(
     @Args('userId') userId: string,
-  ): Promise<CustomerProfileType | null> {
-    return this.service.findByUserId(userId) as any;
+  ): Promise<CustomerProfileEntity | null> {
+    return this.service.findByUserId(userId);
   }
 
   @Mutation(() => CustomerProfileType)
   async upsertCustomerProfile(
     @Args('input') input: UpsertCustomerProfileInput,
-    @CurrentUser() user: any,
-  ): Promise<CustomerProfileType> {
+    @CurrentUser() user: CurrentUserPayload,
+  ): Promise<CustomerProfileEntity> {
     const userId = user.sub;
-    return this.service.upsert(userId, input) as any;
+    return this.service.upsert(userId, input);
   }
 
   @Mutation(() => Boolean)

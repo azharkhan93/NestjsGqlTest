@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { V3 } from 'paseto';
 import * as crypto from 'crypto';
+import { CurrentUserPayload } from '@common/domain/interfaces';
 
 @Injectable()
 export class PasetoService {
@@ -16,16 +17,17 @@ export class PasetoService {
     this.key = crypto.createHash('sha256').update(secret).digest();
   }
 
-  async sign(payload: any): Promise<string> {
+  async sign(payload: Record<string, unknown>): Promise<string> {
     return V3.encrypt(payload, this.key, {
       expiresIn: '4d',
       iat: true,
     });
   }
 
-  async verify(token: string): Promise<any> {
+  async verify(token: string): Promise<CurrentUserPayload | null> {
     try {
-      return await V3.decrypt(token, this.key);
+      const payload = (await V3.decrypt(token, this.key)) as unknown;
+      return payload as CurrentUserPayload;
     } catch {
       return null;
     }

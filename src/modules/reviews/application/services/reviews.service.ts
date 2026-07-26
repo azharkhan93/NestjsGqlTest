@@ -1,38 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/infrastructure/persistence';
+import { IReviewRepository } from '../../domain/repositories/review.repository.interface';
+import { ReviewEntity } from '../../domain/entities/review.entity';
 import { CreateReviewInput } from '../../presentation/graphql/inputs/create-review.input';
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly reviewRepository: IReviewRepository) {}
 
-  async createReview(input: CreateReviewInput) {
-    return this.prisma.review.create({
-      data: {
-        bookingId: input.bookingId,
-        rating: input.rating,
-        comment: input.comment,
-      },
+  async createReview(input: CreateReviewInput): Promise<ReviewEntity> {
+    const review = ReviewEntity.create({
+      bookingId: input.bookingId,
+      rating: input.rating,
+      comment: input.comment,
     });
+    return this.reviewRepository.create(review);
   }
 
-  async getReviewByBookingId(bookingId: string) {
-    return this.prisma.review.findUnique({
-      where: { bookingId },
-    });
+  async getReviewByBookingId(bookingId: string): Promise<ReviewEntity | null> {
+    return this.reviewRepository.findByBookingId(bookingId);
   }
 
-  async getVendorReviews(vendorProfileId: string) {
-    return this.prisma.review.findMany({
-      where: {
-        booking: {
-          service: {
-            vendorProfileId,
-          },
-        },
-        deletedAt: null,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+  async getVendorReviews(vendorProfileId: string): Promise<ReviewEntity[]> {
+    return this.reviewRepository.findByVendorProfileId(vendorProfileId);
   }
 }

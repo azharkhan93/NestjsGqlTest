@@ -4,6 +4,13 @@ import { Twilio } from 'twilio';
 import { PhoneNumber } from '@common/domain/value-objects/phone-number.vo';
 import { ISmsGateway } from '@modules/twilio/domain/ports';
 
+export interface SendSmsResult {
+  success: boolean;
+  message: string;
+  sid?: string;
+  errorCode?: number;
+}
+
 @Injectable()
 export class TwilioSmsGateway implements ISmsGateway {
   private readonly client: Twilio;
@@ -22,7 +29,7 @@ export class TwilioSmsGateway implements ISmsGateway {
     this.client = new Twilio(accountSid, authToken);
   }
 
-  async sendSms(to: string, message: string) {
+  async sendSms(to: string, message: string): Promise<SendSmsResult> {
     try {
       const formattedTo = PhoneNumber.create(to).getValue;
       const response = await this.client.messages.create({
@@ -32,9 +39,21 @@ export class TwilioSmsGateway implements ISmsGateway {
       });
 
       return { success: true, sid: response.sid, message: 'Sent' };
-    } catch (error: any) {
-      this.logger.error(`SMS error: ${error.message}`);
-      return { success: false, message: error.message, errorCode: error.code };
+    } catch (error: unknown) {
+      const errMessage = error instanceof Error ? error.message : String(error);
+      const rawCode =
+        typeof error === 'object' && error !== null && 'code' in error
+          ? (error as { code?: unknown }).code
+          : undefined;
+      const errorCode =
+        typeof rawCode === 'number'
+          ? rawCode
+          : typeof rawCode === 'string'
+            ? parseInt(rawCode, 10) || undefined
+            : undefined;
+
+      this.logger.error(`SMS error: ${errMessage}`);
+      return { success: false, message: errMessage, errorCode };
     }
   }
 }

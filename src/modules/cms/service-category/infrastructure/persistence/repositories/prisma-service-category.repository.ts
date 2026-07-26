@@ -4,7 +4,10 @@ import {
   PrismaService,
 } from '@common/infrastructure/persistence';
 import { ServiceCategoryEntity } from '@modules/cms/service-category/domain/entities';
-import { ServiceCategory as PrismaServiceCategory } from '@prisma/client';
+import {
+  ServiceCategory as PrismaServiceCategory,
+  Prisma,
+} from '@prisma/client';
 import { IServiceCategoryRepository } from '@modules/cms/service-category/domain/repositories';
 
 @Injectable()
@@ -120,7 +123,9 @@ export class PrismaServiceCategoryRepository
     });
   }
 
-  toPrisma(entity: ServiceCategoryEntity): any {
+  toPrisma(
+    entity: ServiceCategoryEntity,
+  ): Prisma.ServiceCategoryUncheckedCreateInput {
     return {
       name: entity.name,
       icon: entity.icon,

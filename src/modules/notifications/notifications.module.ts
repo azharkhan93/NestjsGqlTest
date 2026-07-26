@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@common/infrastructure/persistence/prisma/prisma.module';
+
 import { NotificationService } from './application/services/notification.service';
 import { NotificationResolver } from './presentation/graphql/resolvers/notification.resolver';
 import { FcmService } from './infrastructure/services/fcm.service';
@@ -10,8 +10,10 @@ import { PrismaNotificationRepository } from './infrastructure/persistence/prism
 
 import { CommonModule } from '@common/common.module';
 
+import { BookingsModule } from '@modules/bookings/bookings.module';
+
 @Module({
-  imports: [PrismaModule, CommonModule],
+  imports: [BookingsModule, CommonModule],
   providers: [
     NotificationService,
     NotificationResolver,
