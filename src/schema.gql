@@ -57,6 +57,20 @@ type VendorProfileType {
   categories: [ServiceCategory!]!
   createdAt: DateTime!
   updatedAt: DateTime!
+  user: UserType
+}
+
+type UserType {
+  id: ID!
+  phoneNumber: String!
+  name: String
+  email: String
+  avatarUrl: String
+  avatarPublicId: String
+  roleId: String
+  role: Role
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type BankDetailsType {
@@ -91,6 +105,7 @@ type VendorService {
   pricings: [ServicePricing!]
   createdAt: DateTime!
   updatedAt: DateTime!
+  vendorProfile: VendorProfileType
 }
 
 type VendorSchedule {
@@ -128,22 +143,32 @@ type VendorAvailabilityResponse {
   exceptions: [VendorException!]!
 }
 
-type UserType {
+type AuthPayloadType {
+  token: String!
+  user: UserType!
+}
+
+type Booking {
   id: ID!
-  phoneNumber: String!
-  name: String
-  email: String
-  avatarUrl: String
-  avatarPublicId: String
-  roleId: String
-  role: Role
+  userId: String!
+  user: UserType
+  serviceId: String!
+  service: VendorService
+  vendorProfile: VendorProfileType
+  status: BookingStatus!
+  scheduledAt: DateTime!
+  totalPrice: Float
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
-type AuthPayloadType {
-  token: String!
-  user: UserType!
+"""Status of the booking"""
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 
 type UploadResponseType {
@@ -189,6 +214,7 @@ type CustomerProfileType {
   addresses: [CustomerAddressType]
   createdAt: DateTime!
   updatedAt: DateTime!
+  user: UserType
 }
 
 type DriverLocationType {
@@ -215,29 +241,6 @@ type UserDeviceTokenType {
   fcmToken: String!
   deviceType: String!
   createdAt: DateTime!
-}
-
-type Booking {
-  id: ID!
-  userId: String!
-  user: UserType
-  serviceId: String!
-  service: VendorService
-  vendorProfile: VendorProfileType
-  status: BookingStatus!
-  scheduledAt: DateTime!
-  totalPrice: Float
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-"""Status of the booking"""
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
 }
 
 type Payment {
@@ -267,6 +270,7 @@ type Review {
   comment: String
   createdAt: DateTime!
   updatedAt: DateTime!
+  booking: Booking
 }
 
 type Dispute {
@@ -276,11 +280,14 @@ type Dispute {
   status: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  booking: Booking
 }
 
 type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
+  users: [UserType!]!
+  user(id: ID!): UserType!
   getVendorProfile(userId: String!): VendorProfileType!
   getVendorProfiles: [VendorProfileType!]!
   getVendorProfileById(id: ID!): VendorProfileType!
@@ -289,17 +296,15 @@ type Query {
   getVendorServices(vendorProfileId: ID!): [VendorService!]!
   getVendorService(id: ID!): VendorService!
   getVendorAvailability(vendorProfileId: ID!): VendorAvailabilityResponse!
-  users: [UserType!]!
-  user(id: ID!): UserType!
+  customerBookings(userId: ID!, status: BookingStatus): [Booking!]!
+  vendorBookings(vendorProfileId: ID!, status: BookingStatus): [Booking!]!
+  bookingById(id: ID!): Booking!
   getHeroContent: HeroContent
   serviceCategories: [ServiceCategory!]!
   getCustomerProfile(userId: String!): CustomerProfileType
   getCustomerAddresses(customerProfileId: ID!): [CustomerAddressType!]!
   driverLocation(bookingId: ID!): DriverLocationType
   getUserNotifications: [NotificationType!]!
-  customerBookings(userId: ID!, status: BookingStatus): [Booking!]!
-  vendorBookings(vendorProfileId: ID!, status: BookingStatus): [Booking!]!
-  bookingById(id: ID!): Booking!
   getPaymentByOrderId(orderId: String!): Payment
   reviewByBookingId(bookingId: ID!): Review
   vendorReviews(vendorProfileId: ID!): [Review!]!
@@ -308,6 +313,10 @@ type Query {
 
 type Mutation {
   createRole(name: UserRole!): Role!
+  loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): AuthPayloadType!
+  updateUserAvatar(id: ID!, avatarUrl: String!): UserType!
+  deleteUser(id: ID!): Boolean!
+  logout: Boolean!
   requestOtp(phoneNumber: String!): SmsResponse!
   verifyOtp(phoneNumber: String!, code: String!): VerifyOtpResponse!
   createVendorProfile(input: CreateVendorProfileInput!): VendorProfileType!
@@ -327,10 +336,8 @@ type Mutation {
   addVendorException(vendorProfileId: ID!, input: CreateExceptionInput!): VendorException!
   updateVendorException(id: ID!, input: UpdateExceptionInput!): VendorException!
   removeVendorException(id: ID!): Boolean!
-  loginByPhone(phoneNumber: String!, code: String!, role: UserRole!): AuthPayloadType!
-  updateUserAvatar(id: ID!, avatarUrl: String!): UserType!
-  deleteUser(id: ID!): Boolean!
-  logout: Boolean!
+  createBooking(input: CreateBookingInput!): Booking!
+  updateBookingStatus(id: ID!, status: BookingStatus!): Booking!
   uploadImage(file: Upload!): UploadResponseType!
   deleteImage(publicId: String!): Boolean!
   adminLogin(email: String!, password: String!): AdminAuthPayloadType!
@@ -349,8 +356,6 @@ type Mutation {
   registerDeviceToken(input: RegisterDeviceTokenInput!): UserDeviceTokenType!
   markNotificationAsRead(id: ID!): NotificationType
   sendBookingNotification(bookingId: ID!, type: String!): Boolean!
-  createBooking(input: CreateBookingInput!): Booking!
-  updateBookingStatus(id: ID!, status: BookingStatus!): Booking!
   createPayment(input: CreatePaymentInput!): Payment!
   verifyPaymentSuccess(input: VerifyPaymentInput!): Payment!
   createReview(input: CreateReviewInput!): Review!
@@ -468,6 +473,12 @@ input UpdateExceptionInput {
   endTime: String
 }
 
+input CreateBookingInput {
+  userId: ID!
+  serviceId: ID!
+  scheduledAt: DateTime!
+}
+
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
@@ -512,12 +523,6 @@ input UpsertCustomerAddressInput {
 input RegisterDeviceTokenInput {
   fcmToken: String!
   deviceType: String!
-}
-
-input CreateBookingInput {
-  userId: ID!
-  serviceId: ID!
-  scheduledAt: DateTime!
 }
 
 input CreatePaymentInput {

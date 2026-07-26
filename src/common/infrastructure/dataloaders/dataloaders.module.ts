@@ -12,8 +12,8 @@ import { BookingDataLoader } from './booking';
 @Module({
   imports: [
     RolesModule,
-    UsersModule,
-    VendorsModule,
+    forwardRef(() => UsersModule),
+    forwardRef(() => VendorsModule),
     forwardRef(() => BookingsModule),
   ],
   providers: [
