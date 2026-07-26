@@ -9,10 +9,10 @@ import {
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
-import { DisputesService } from '../../../application/services/disputes.service';
-import { DisputeType } from '../types/dispute.type';
-import { CreateDisputeInput } from '../inputs/create-dispute.input';
-import { BookingType } from '../../../../bookings/presentation/graphql/types/booking.type';
+import { DisputesService } from '@modules/disputes/application/services/disputes.service';
+import { DisputeType } from '@modules/disputes/presentation/graphql/types/dispute.type';
+import { CreateDisputeInput } from '@modules/disputes/presentation/graphql/inputs/create-dispute.input';
+import { BookingType } from '@modules/bookings/presentation/graphql/types/booking.type';
 import { BookingDataLoader } from '@common/infrastructure/dataloaders/booking';
 
 @Resolver(() => DisputeType)

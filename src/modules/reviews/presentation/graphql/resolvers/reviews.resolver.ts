@@ -9,10 +9,10 @@ import {
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
-import { ReviewsService } from '../../../application/services/reviews.service';
-import { ReviewType } from '../types/review.type';
-import { CreateReviewInput } from '../inputs/create-review.input';
-import { BookingType } from '../../../../bookings/presentation/graphql/types/booking.type';
+import { ReviewsService } from '@modules/reviews/application/services/reviews.service';
+import { ReviewType } from '@modules/reviews/presentation/graphql/types/review.type';
+import { CreateReviewInput } from '@modules/reviews/presentation/graphql/inputs/create-review.input';
+import { BookingType } from '@modules/bookings/presentation/graphql/types/booking.type';
 import { BookingDataLoader } from '@common/infrastructure/dataloaders/booking';
 
 @Resolver(() => ReviewType)

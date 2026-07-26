@@ -8,14 +8,14 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { CustomerProfileService } from '../../../application/services/customer-profile.service';
-import { CustomerProfileType } from '../types/customer-profile.type';
-import { UpsertCustomerProfileInput } from '../inputs/upsert-customer-profile.input';
-import { GqlAuthGuard } from '@common/presentation/guards/index';
-import { CurrentUser } from '@common/presentation/decorators/index';
+import { CustomerProfileService } from '@modules/customers/application/services/customer-profile.service';
+import { CustomerProfileType } from '@modules/customers/presentation/graphql/types/customer-profile.type';
+import { UpsertCustomerProfileInput } from '@modules/customers/presentation/graphql/inputs/upsert-customer-profile.input';
+import { GqlAuthGuard } from '@common/presentation/guards';
+import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
-import { CustomerProfileEntity } from '../../../domain/entities/customer-profile.entity';
-import { UserType } from '../../../../users/presentation/graphql/types/user.type';
+import { CustomerProfileEntity } from '@modules/customers/domain/entities/customer-profile.entity';
+import { UserType } from '@modules/users/presentation/graphql/types/user.type';
 import { UserDataLoader } from '@common/infrastructure/dataloaders/user';
 
 @Resolver(() => CustomerProfileType)

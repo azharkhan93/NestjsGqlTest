@@ -10,16 +10,16 @@ import {
 import { UseGuards } from '@nestjs/common';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { VendorProfileType } from '@modules/vendors/presentation/graphql/types';
-import { GqlAuthGuard } from '@common/presentation/guards/index';
-import { CurrentUser } from '@common/presentation/decorators/index';
+import { GqlAuthGuard } from '@common/presentation/guards';
+import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
 import {
   CreateVendorProfileInput,
   UpdateVendorProfileInput,
 } from '@modules/vendors/presentation/graphql/inputs';
-import { UserType } from '../../../../../users/presentation/graphql/types/user.type';
+import { UserType } from '@modules/users/presentation/graphql/types/user.type';
 import { UserDataLoader } from '@common/infrastructure/dataloaders/user';
-import { VendorProfileEntity } from '../../../../domain/entities';
+import { VendorProfileEntity } from '@modules/vendors/domain/entities';
 
 @Resolver(() => VendorProfileType)
 export class VendorProfileResolver {

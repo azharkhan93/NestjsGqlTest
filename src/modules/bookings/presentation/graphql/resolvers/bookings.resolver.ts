@@ -9,15 +9,15 @@ import {
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
-import { BookingService } from '../../../application/services/booking.service';
+import { BookingService } from '@modules/bookings/application/services/booking.service';
 import {
   BookingEntity,
   BookingStatus,
-} from '../../../domain/entities/booking.entity';
-import { BookingType } from '../types/booking.type';
-import { CreateBookingInput } from '../inputs/create-booking.input';
-import { UserType } from '../../../../users/presentation/graphql/types/user.type';
-import { VendorServiceType } from '../../../../vendors/vendor-services/presentation/graphql/types/vendor-service.type';
+} from '@modules/bookings/domain/entities/booking.entity';
+import { BookingType } from '@modules/bookings/presentation/graphql/types/booking.type';
+import { CreateBookingInput } from '@modules/bookings/presentation/graphql/inputs/create-booking.input';
+import { UserType } from '@modules/users/presentation/graphql/types/user.type';
+import { VendorServiceType } from '@modules/vendors/vendor-services/presentation/graphql/types/vendor-service.type';
 import { UserDataLoader } from '@common/infrastructure/dataloaders/user';
 import { ServiceDataLoader } from '@common/infrastructure/dataloaders/service';
 

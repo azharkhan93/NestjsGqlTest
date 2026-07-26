@@ -10,7 +10,7 @@ import {
 import { UseGuards } from '@nestjs/common';
 import { VendorServiceService } from '@modules/vendors/vendor-services/application/services';
 import { VendorServiceType } from '@modules/vendors/vendor-services/presentation/graphql/types';
-import { GqlAuthGuard } from '@common/presentation/guards/index';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import {
   CreateVendorServiceInput,
   UpdateVendorServiceInput,
