@@ -27,7 +27,6 @@ async function main(): Promise<void> {
 
   console.log('✅ Roles seeded successfully');
 
-
   console.log('Seeding Super Admin...');
   const adminEmail = process.env.SUPER_ADMIN_EMAIL;
   const adminPassword = process.env.SUPER_ADMIN_PASSWORD;
