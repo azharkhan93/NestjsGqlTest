@@ -162,6 +162,7 @@ model Service {
   deletedAt         DateTime?        @map("deleted_at")
 
   @@index([vendorProfileId, deletedAt])
+  @@index([categoryId, deletedAt])
   @@map("services")
 }
 
@@ -274,6 +275,7 @@ model ServicePricing {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@unique([serviceId, categoryId])
+  @@index([categoryId])
   @@map("service_pricings")
 }
 

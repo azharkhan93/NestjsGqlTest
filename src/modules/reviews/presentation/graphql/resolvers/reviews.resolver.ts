@@ -1,11 +1,30 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { ReviewsService } from '../../../application/services/reviews.service';
 import { ReviewType } from '../types/review.type';
 import { CreateReviewInput } from '../inputs/create-review.input';
+import { BookingType } from '../../../../bookings/presentation/graphql/types/booking.type';
+import { BookingDataLoader } from '@common/infrastructure/dataloaders/booking';
 
 @Resolver(() => ReviewType)
 export class ReviewsResolver {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(
+    private readonly reviewsService: ReviewsService,
+    private readonly bookingDataLoader: BookingDataLoader,
+  ) {}
+
+  @ResolveField(() => BookingType, { nullable: true })
+  async booking(@Parent() review: ReviewType) {
+    if (!review.bookingId) return null;
+    return this.bookingDataLoader.load(review.bookingId);
+  }
 
   @Query(() => ReviewType, { name: 'reviewByBookingId', nullable: true })
   async getReviewByBookingId(

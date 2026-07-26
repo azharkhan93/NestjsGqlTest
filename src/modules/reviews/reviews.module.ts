@@ -4,9 +4,10 @@ import { ReviewsService } from './application/services/reviews.service';
 import { ReviewsResolver } from './presentation/graphql/resolvers/reviews.resolver';
 import { IReviewRepository } from './domain/repositories/review.repository.interface';
 import { PrismaReviewRepository } from './infrastructure/persistence/prisma-review.repository';
+import { DataLoadersModule } from '@common/infrastructure/dataloaders/dataloaders.module';
 
 @Module({
-  imports: [CommonModule],
+  imports: [CommonModule, DataLoadersModule],
   providers: [
     ReviewsService,
     ReviewsResolver,

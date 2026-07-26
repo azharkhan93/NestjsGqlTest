@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CommonModule } from '@common/common.module';
 import { VendorProfileService } from './application/services/vendor-profile/vendor-profile.service';
 import { VendorProfileResolver } from './presentation/graphql/resolvers/vendor-profile/vendor-profile.resolver';
@@ -17,9 +16,10 @@ import { AvailabilityService } from './availability/application/services';
 import { AvailabilityResolver } from './availability/presentation/graphql/resolvers';
 import { IAvailabilityRepository } from './availability/domain/repositories';
 import { AvailabilityRepository } from './availability/infrastructure/persistence/repositories';
+import { DataLoadersModule } from '@common/infrastructure/dataloaders/dataloaders.module';
 
 @Module({
-  imports: [CommonModule],
+  imports: [CommonModule, forwardRef(() => DataLoadersModule)],
   providers: [
     VendorProfileService,
     VendorProfileResolver,
@@ -34,6 +34,13 @@ import { AvailabilityRepository } from './availability/infrastructure/persistenc
     AvailabilityResolver,
     { provide: IAvailabilityRepository, useClass: AvailabilityRepository },
   ],
-  exports: [VendorProfileService, BankDetailsService, VendorServiceService, AvailabilityService],
+  exports: [
+    VendorProfileService,
+    BankDetailsService,
+    VendorServiceService,
+    AvailabilityService,
+    IVendorProfileRepository,
+    IVendorServiceRepository,
+  ],
 })
 export class VendorsModule {}

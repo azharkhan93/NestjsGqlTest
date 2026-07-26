@@ -8,9 +8,10 @@ import { ICustomerProfileRepository } from './domain/repositories/customer-profi
 import { ICustomerAddressRepository } from './domain/repositories/customer-address.repository.interface';
 import { CustomerProfileRepository } from './infrastructure/persistence/repositories/customer-profile.repository';
 import { CustomerAddressRepository } from './infrastructure/persistence/repositories/customer-address.repository';
+import { DataLoadersModule } from '@common/infrastructure/dataloaders/dataloaders.module';
 
 @Module({
-  imports: [CommonModule],
+  imports: [CommonModule, DataLoadersModule],
   providers: [
     CustomerProfileService,
     CustomerAddressService,

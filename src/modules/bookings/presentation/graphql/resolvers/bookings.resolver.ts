@@ -1,66 +1,84 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
-import { BookingStatus as PrismaBookingStatus } from '@prisma/client';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { BookingService } from '../../../application/services/booking.service';
-import { BookingStatus } from '../../../domain/entities/booking.entity';
+import {
+  BookingEntity,
+  BookingStatus,
+} from '../../../domain/entities/booking.entity';
 import { BookingType } from '../types/booking.type';
 import { CreateBookingInput } from '../inputs/create-booking.input';
+import { UserType } from '../../../../users/presentation/graphql/types/user.type';
+import { VendorServiceType } from '../../../../vendors/vendor-services/presentation/graphql/types/vendor-service.type';
+import { UserDataLoader } from '@common/infrastructure/dataloaders/user';
+import { ServiceDataLoader } from '@common/infrastructure/dataloaders/service';
 
 @Resolver(() => BookingType)
 export class BookingsResolver {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(
+    private readonly bookingService: BookingService,
+    private readonly userDataLoader: UserDataLoader,
+    private readonly serviceDataLoader: ServiceDataLoader,
+  ) {}
+
+  @ResolveField(() => UserType, { nullable: true })
+  async user(@Parent() booking: BookingEntity) {
+    if (booking.user) return booking.user;
+    if (!booking.userId) return null;
+    return this.userDataLoader.load(booking.userId);
+  }
+
+  @ResolveField(() => VendorServiceType, { nullable: true })
+  async service(@Parent() booking: BookingEntity) {
+    if (booking.service) return booking.service;
+    if (!booking.serviceId) return null;
+    return this.serviceDataLoader.load(booking.serviceId);
+  }
 
   @Query(() => [BookingType], { name: 'customerBookings' })
   async getCustomerBookings(
     @Args('userId', { type: () => ID }) userId: string,
-    @Args('status', { type: () => PrismaBookingStatus, nullable: true })
-    status?: PrismaBookingStatus,
-  ): Promise<BookingType[]> {
-    const bookings = await this.bookingService.getCustomerBookings(
-      userId,
-      status as unknown as BookingStatus,
-    );
-    return bookings as unknown as BookingType[];
+    @Args('status', { type: () => BookingStatus, nullable: true })
+    status?: BookingStatus,
+  ): Promise<BookingEntity[]> {
+    return this.bookingService.getCustomerBookings(userId, status);
   }
 
   @Query(() => [BookingType], { name: 'vendorBookings' })
   async getVendorBookings(
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
-    @Args('status', { type: () => PrismaBookingStatus, nullable: true })
-    status?: PrismaBookingStatus,
-  ): Promise<BookingType[]> {
-    const bookings = await this.bookingService.getVendorBookings(
-      vendorProfileId,
-      status as unknown as BookingStatus,
-    );
-    return bookings as unknown as BookingType[];
+    @Args('status', { type: () => BookingStatus, nullable: true })
+    status?: BookingStatus,
+  ): Promise<BookingEntity[]> {
+    return this.bookingService.getVendorBookings(vendorProfileId, status);
   }
 
   @Query(() => BookingType, { name: 'bookingById' })
   async getBookingById(
     @Args('id', { type: () => ID }) id: string,
-  ): Promise<BookingType> {
-    const booking = await this.bookingService.getBookingById(id);
-    return booking as unknown as BookingType;
+  ): Promise<BookingEntity> {
+    return this.bookingService.getBookingById(id);
   }
 
   @Mutation(() => BookingType)
   async createBooking(
     @Args('input') input: CreateBookingInput,
-  ): Promise<BookingType> {
-    const booking = await this.bookingService.createBooking(input);
-    return booking as unknown as BookingType;
+  ): Promise<BookingEntity> {
+    return this.bookingService.createBooking(input);
   }
 
   @Mutation(() => BookingType)
   async updateBookingStatus(
     @Args('id', { type: () => ID }) id: string,
-    @Args('status', { type: () => PrismaBookingStatus })
-    status: PrismaBookingStatus,
-  ): Promise<BookingType> {
-    const booking = await this.bookingService.updateBookingStatus(
-      id,
-      status as unknown as BookingStatus,
-    );
-    return booking as unknown as BookingType;
+    @Args('status', { type: () => BookingStatus })
+    status: BookingStatus,
+  ): Promise<BookingEntity> {
+    return this.bookingService.updateBookingStatus(id, status);
   }
 }

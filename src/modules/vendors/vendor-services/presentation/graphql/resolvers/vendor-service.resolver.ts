@@ -1,4 +1,12 @@
-import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  ID,
+  Mutation,
+  Query,
+  Resolver,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { VendorServiceService } from '@modules/vendors/vendor-services/application/services';
 import { VendorServiceType } from '@modules/vendors/vendor-services/presentation/graphql/types';
@@ -7,10 +15,22 @@ import {
   CreateVendorServiceInput,
   UpdateVendorServiceInput,
 } from '@modules/vendors/vendor-services/presentation/graphql/inputs';
+import { VendorProfileType } from '@modules/vendors/presentation/graphql/types/vendor-profile/vendor-profile.type';
+import { VendorProfileDataLoader } from '@common/infrastructure/dataloaders/vendor-profile';
+import { VendorServiceEntity } from '@modules/vendors/vendor-services/domain/entities';
 
 @Resolver(() => VendorServiceType)
 export class VendorServiceResolver {
-  constructor(private readonly service: VendorServiceService) {}
+  constructor(
+    private readonly service: VendorServiceService,
+    private readonly vendorProfileDataLoader: VendorProfileDataLoader,
+  ) {}
+
+  @ResolveField(() => VendorProfileType, { nullable: true })
+  async vendorProfile(@Parent() vendorService: VendorServiceEntity) {
+    if (!vendorService.vendorProfileId) return null;
+    return this.vendorProfileDataLoader.load(vendorService.vendorProfileId);
+  }
 
   @Query(() => [VendorServiceType])
   async getVendorServices(

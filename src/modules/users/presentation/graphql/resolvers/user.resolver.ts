@@ -8,23 +8,23 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { UserService } from '@modules/users/application/services/user.service';
-import { RolesService } from '@modules/roles/application/services/roles.service';
 import { UserType } from '../types/user.type';
 import { RoleType } from '@modules/roles/presentation/graphql/types/role.type';
 import { UserRole } from '@common/domain/enums';
 import { AuthPayloadType } from '../types/auth-payload.type';
+import { RoleDataLoader } from '@common/infrastructure/dataloaders/role';
 
 @Resolver(() => UserType)
 export class UserResolver {
   constructor(
     private readonly service: UserService,
-    private readonly rolesService: RolesService,
+    private readonly roleDataLoader: RoleDataLoader,
   ) {}
 
   @ResolveField(() => RoleType, { nullable: true })
   async role(@Parent() user: UserType) {
     if (!user.roleId) return null;
-    return this.rolesService.findById(user.roleId);
+    return this.roleDataLoader.load(user.roleId);
   }
 
   @Query(() => [UserType])

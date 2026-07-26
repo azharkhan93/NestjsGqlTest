@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CustomerProfileService } from '@modules/customers/application/services/customer-profile.service';
 import { TrackingService } from '@modules/tracking/application/services/tracking.service';
 import { NotificationService } from '@modules/notifications/application/services/notification.service';
-import { PrismaService } from '@common/infrastructure/persistence';
-import { BookingStatus } from '@prisma/client';
+import { IBookingRepository } from '@modules/bookings/domain/repositories';
+import { BookingStatus } from '@modules/bookings/domain/entities';
 
 @Injectable()
 export class PaymentEventDispatcher {
@@ -13,7 +13,7 @@ export class PaymentEventDispatcher {
     private readonly customerProfileService: CustomerProfileService,
     private readonly trackingService: TrackingService,
     private readonly notificationService: NotificationService,
-    private readonly prisma: PrismaService,
+    private readonly bookingRepository: IBookingRepository,
   ) {}
 
   dispatchPaymentSuccess(paymentId: string, userId: string): void {
@@ -28,22 +28,18 @@ export class PaymentEventDispatcher {
       try {
         const profile = await this.customerProfileService.findByUserId(userId);
         if (profile) {
-          const latestBooking = await this.prisma.booking.findFirst({
-            where: {
-              userId: profile.userId,
-              status: BookingStatus.PENDING,
-            },
-            orderBy: {
-              createdAt: 'desc',
-            },
-          });
+          const pendingBookings =
+            await this.bookingRepository.findByUserIdAndStatus(
+              profile.userId,
+              BookingStatus.PENDING,
+            );
+
+          const latestBooking = pendingBookings[0];
 
           if (latestBooking) {
             bookingId = latestBooking.id;
-            await this.prisma.booking.update({
-              where: { id: bookingId },
-              data: { status: BookingStatus.CONFIRMED },
-            });
+            latestBooking.status = BookingStatus.CONFIRMED;
+            await this.bookingRepository.update(bookingId, latestBooking);
             this.logger.log(
               `Successfully confirmed Booking ${bookingId} for successful Payment ${paymentId}`,
             );

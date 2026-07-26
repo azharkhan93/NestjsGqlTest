@@ -42,6 +42,7 @@
     "class-validator": "^0.14.3",
     "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
+    "dataloader": "^2.2.3",
     "express": "^5.0.0",
     "firebase-admin": "^13.10.0",
     "graphql": "^16.12.0",

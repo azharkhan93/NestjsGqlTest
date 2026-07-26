@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { VendorProfileType } from '@modules/vendors/presentation/graphql/types';
@@ -9,10 +17,22 @@ import {
   CreateVendorProfileInput,
   UpdateVendorProfileInput,
 } from '@modules/vendors/presentation/graphql/inputs';
+import { UserType } from '../../../../../users/presentation/graphql/types/user.type';
+import { UserDataLoader } from '@common/infrastructure/dataloaders/user';
+import { VendorProfileEntity } from '../../../../domain/entities';
 
 @Resolver(() => VendorProfileType)
 export class VendorProfileResolver {
-  constructor(private readonly service: VendorProfileService) {}
+  constructor(
+    private readonly service: VendorProfileService,
+    private readonly userDataLoader: UserDataLoader,
+  ) {}
+
+  @ResolveField(() => UserType, { nullable: true })
+  async user(@Parent() vendor: VendorProfileEntity) {
+    if (!vendor.userId) return null;
+    return this.userDataLoader.load(vendor.userId);
+  }
 
   @Query(() => VendorProfileType)
   async getVendorProfile(@Args('userId') userId: string) {

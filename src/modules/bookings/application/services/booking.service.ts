@@ -6,7 +6,8 @@ import {
   BookingStatus,
 } from '@modules/bookings/domain/entities';
 
-export interface CreateBookingCommand {
+export interface CreateBookingInputDto {
+  userId: string;
   serviceId: string;
   scheduledAt: string | Date;
 }
@@ -15,11 +16,7 @@ export interface CreateBookingCommand {
 export class BookingService {
   constructor(private readonly repository: IBookingRepository) {}
 
-  async createBooking(input: {
-    userId: string;
-    serviceId: string;
-    scheduledAt: string | Date;
-  }): Promise<BookingEntity> {
+  async createBooking(input: CreateBookingInputDto): Promise<BookingEntity> {
     const booking = BookingEntity.create({
       userId: input.userId,
       serviceId: input.serviceId,
@@ -54,6 +51,10 @@ export class BookingService {
     return assertFound(await this.repository.findOne(id), `Booking ${id}`);
   }
 
+  async getServiceBookings(serviceId: string): Promise<BookingEntity[]> {
+    return this.repository.findByServiceId(serviceId);
+  }
+
   async updateBookingStatus(
     id: string,
     status: BookingStatus,
@@ -62,25 +63,5 @@ export class BookingService {
     booking.status = status;
     await this.repository.update(id, booking);
     return this.getBookingById(id);
-  }
-
-  async create(command: CreateBookingCommand, userId: string) {
-    return this.createBooking({ ...command, userId });
-  }
-
-  async getUserBookings(userId: string) {
-    return this.getCustomerBookings(userId);
-  }
-
-  async getServiceBookings(serviceId: string) {
-    return this.repository.findByServiceId(serviceId);
-  }
-
-  async findById(id: string) {
-    return this.getBookingById(id);
-  }
-
-  async updateStatus(id: string, status: BookingStatus) {
-    return this.updateBookingStatus(id, status);
   }
 }

@@ -9,11 +9,13 @@ import { PrismaModule } from './common/infrastructure/persistence/prisma/prisma.
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { GqlThrottlerGuard } from './common/presentation/guards';
+import { DataLoadersModule } from './common/infrastructure/dataloaders/dataloaders.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    DataLoadersModule,
     ModulesModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

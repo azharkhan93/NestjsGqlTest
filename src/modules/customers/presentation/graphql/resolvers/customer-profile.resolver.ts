@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { CustomerProfileService } from '../../../application/services/customer-profile.service';
 import { CustomerProfileType } from '../types/customer-profile.type';
@@ -7,11 +15,22 @@ import { GqlAuthGuard } from '@common/presentation/guards/index';
 import { CurrentUser } from '@common/presentation/decorators/index';
 import { CurrentUserPayload } from '@common/domain/interfaces';
 import { CustomerProfileEntity } from '../../../domain/entities/customer-profile.entity';
+import { UserType } from '../../../../users/presentation/graphql/types/user.type';
+import { UserDataLoader } from '@common/infrastructure/dataloaders/user';
 
 @Resolver(() => CustomerProfileType)
 @UseGuards(GqlAuthGuard)
 export class CustomerProfileResolver {
-  constructor(private readonly service: CustomerProfileService) {}
+  constructor(
+    private readonly service: CustomerProfileService,
+    private readonly userDataLoader: UserDataLoader,
+  ) {}
+
+  @ResolveField(() => UserType, { nullable: true })
+  async user(@Parent() profile: CustomerProfileEntity) {
+    if (!profile.userId) return null;
+    return this.userDataLoader.load(profile.userId);
+  }
 
   @Query(() => CustomerProfileType, { nullable: true })
   async getCustomerProfile(

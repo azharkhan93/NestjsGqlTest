@@ -1,6 +1,5 @@
 import { IRepository } from '@common/domain/repositories';
-import { BookingEntity } from '../entities';
-import { BookingStatus } from '@prisma/client';
+import { BookingEntity, BookingStatus } from '../entities';
 
 export abstract class IBookingRepository extends IRepository<BookingEntity> {
   abstract findByUserId(userId: string): Promise<BookingEntity[]>;

@@ -5,7 +5,7 @@ import {
   registerEnumType,
   Float,
 } from '@nestjs/graphql';
-import { BookingStatus } from '@prisma/client';
+import { BookingStatus } from '../../../domain/entities/booking.entity';
 import { VendorServiceType } from '../../../../vendors/vendor-services/presentation/graphql/types/vendor-service.type';
 import { VendorProfileType } from '../../../../vendors/presentation/graphql/types/vendor-profile/vendor-profile.type';
 import { UserType } from '../../../../users/presentation/graphql/types/user.type';

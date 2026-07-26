@@ -3,6 +3,7 @@ import { CommonModule } from '@common/common.module';
 import { CustomersModule } from '@modules/customers/customers.module';
 import { TrackingModule } from '@modules/tracking/tracking.module';
 import { NotificationsModule } from '@modules/notifications/notifications.module';
+import { BookingsModule } from '@modules/bookings/bookings.module';
 import { PaymentService } from './application/services/payment.service';
 import { PaymentEventDispatcher } from './application/services/payment-event.dispatcher';
 import { PaymentResolver } from './presentation/graphql/resolvers/payment.resolver';
@@ -12,7 +13,13 @@ import { PaymentRepository } from './infrastructure/persistence/repositories/pay
 import { RazorpayGateway } from './infrastructure/gateways/razorpay.gateway';
 
 @Module({
-  imports: [CommonModule, CustomersModule, TrackingModule, NotificationsModule],
+  imports: [
+    CommonModule,
+    CustomersModule,
+    TrackingModule,
+    NotificationsModule,
+    BookingsModule,
+  ],
   providers: [
     PaymentService,
     PaymentEventDispatcher,
