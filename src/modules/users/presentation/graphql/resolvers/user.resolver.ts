@@ -7,6 +7,8 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import { UserService } from '@modules/users/application/services/user.service';
 import { UserType } from '../types/user.type';
 import { RoleType } from '@modules/roles/presentation/graphql/types/role.type';
@@ -28,11 +30,13 @@ export class UserResolver {
   }
 
   @Query(() => [UserType])
+  @UseGuards(GqlAuthGuard)
   async users() {
     return this.service.findAll();
   }
 
   @Query(() => UserType)
+  @UseGuards(GqlAuthGuard)
   async user(@Args('id', { type: () => ID }) id: string) {
     return this.service.findById(id);
   }
@@ -47,6 +51,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserType)
+  @UseGuards(GqlAuthGuard)
   async updateUserAvatar(
     @Args('id', { type: () => ID }) id: string,
     @Args('avatarUrl') avatarUrl: string,
@@ -55,6 +60,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
   async deleteUser(@Args('id', { type: () => ID }) id: string) {
     return this.service.delete(id);
   }

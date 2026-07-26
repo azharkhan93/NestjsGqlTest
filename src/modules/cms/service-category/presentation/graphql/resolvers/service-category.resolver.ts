@@ -1,4 +1,6 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import { ServiceCategory } from '@modules/cms/service-category/presentation/graphql/types';
 import { ServiceCategoryService } from '@modules/cms/service-category/application/services';
 import {
@@ -19,6 +21,7 @@ export class ServiceCategoryResolver {
   }
 
   @Mutation(() => ServiceCategory)
+  @UseGuards(GqlAuthGuard)
   async createServiceCategory(
     @Args('input') input: CreateServiceCategoryInput,
   ) {
@@ -26,6 +29,7 @@ export class ServiceCategoryResolver {
   }
 
   @Mutation(() => ServiceCategory)
+  @UseGuards(GqlAuthGuard)
   async updateServiceCategory(
     @Args('id') id: string,
     @Args('input') input: UpdateServiceCategoryInput,
@@ -38,13 +42,15 @@ export class ServiceCategoryResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
   async deleteServiceCategory(@Args('id') id: string) {
     return this.serviceCategoryService.deleteCategory(id);
   }
 
   @Mutation(() => [ServiceCategory])
+  @UseGuards(GqlAuthGuard)
   async syncServiceCategories(
-    @Args({ name: 'categories', type: () => [SyncServiceCategoryInput] })
+    @Args('categories', { type: () => [SyncServiceCategoryInput] })
     categories: SyncServiceCategoryInput[],
   ) {
     return this.serviceCategoryService.syncCategories(categories);

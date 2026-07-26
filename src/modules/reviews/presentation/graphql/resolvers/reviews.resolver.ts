@@ -7,6 +7,8 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import { ReviewsService } from '../../../application/services/reviews.service';
 import { ReviewType } from '../types/review.type';
 import { CreateReviewInput } from '../inputs/create-review.input';
@@ -47,6 +49,7 @@ export class ReviewsResolver {
   }
 
   @Mutation(() => ReviewType)
+  @UseGuards(GqlAuthGuard)
   async createReview(
     @Args('input') input: CreateReviewInput,
   ): Promise<ReviewType> {

@@ -7,6 +7,8 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import { BookingService } from '../../../application/services/booking.service';
 import {
   BookingEntity,
@@ -20,6 +22,7 @@ import { UserDataLoader } from '@common/infrastructure/dataloaders/user';
 import { ServiceDataLoader } from '@common/infrastructure/dataloaders/service';
 
 @Resolver(() => BookingType)
+@UseGuards(GqlAuthGuard)
 export class BookingsResolver {
   constructor(
     private readonly bookingService: BookingService,

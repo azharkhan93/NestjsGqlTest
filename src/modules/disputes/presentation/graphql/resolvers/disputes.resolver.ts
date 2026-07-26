@@ -7,6 +7,8 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import { DisputesService } from '../../../application/services/disputes.service';
 import { DisputeType } from '../types/dispute.type';
 import { CreateDisputeInput } from '../inputs/create-dispute.input';
@@ -14,6 +16,7 @@ import { BookingType } from '../../../../bookings/presentation/graphql/types/boo
 import { BookingDataLoader } from '@common/infrastructure/dataloaders/booking';
 
 @Resolver(() => DisputeType)
+@UseGuards(GqlAuthGuard)
 export class DisputesResolver {
   constructor(
     private readonly disputesService: DisputesService,

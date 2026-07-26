@@ -1,9 +1,12 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import { BankDetailsService } from '@modules/vendors/bank-details/application/services';
 import { BankDetailsType } from '../types';
 import { UpsertBankDetailsInput } from '../inputs';
 
 @Resolver(() => BankDetailsType)
+@UseGuards(GqlAuthGuard)
 export class BankDetailsResolver {
   constructor(private readonly service: BankDetailsService) {}
 
@@ -11,7 +14,7 @@ export class BankDetailsResolver {
   async getVendorBankDetails(
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
   ): Promise<BankDetailsType | null> {
-    return this.service.findByVendorProfileId(vendorProfileId) as any;
+    return this.service.findByVendorProfileId(vendorProfileId);
   }
 
   @Mutation(() => BankDetailsType)
@@ -19,7 +22,7 @@ export class BankDetailsResolver {
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @Args('input') input: UpsertBankDetailsInput,
   ): Promise<BankDetailsType> {
-    return this.service.upsert(vendorProfileId, input) as any;
+    return this.service.upsert(vendorProfileId, input);
   }
 
   @Mutation(() => Boolean)
