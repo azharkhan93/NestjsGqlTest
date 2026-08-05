@@ -34,17 +34,15 @@ export class BookingsResolver {
   ) {}
 
   @ResolveField(() => UserType, { nullable: true })
-  async user(@Parent() booking: BookingEntity) {
-    if (booking.user) return booking.user;
-    if (!booking.userId) return null;
-    return this.userDataLoader.load(booking.userId);
+  async user(@Parent() { userId, user }: BookingEntity) {
+    return user ?? (userId ? this.userDataLoader.load(userId) : null);
   }
 
   @ResolveField(() => VendorServiceType, { nullable: true })
-  async service(@Parent() booking: BookingEntity) {
-    if (booking.service) return booking.service;
-    if (!booking.serviceId) return null;
-    return this.serviceDataLoader.load(booking.serviceId);
+  async service(@Parent() { serviceId, service }: BookingEntity) {
+    return (
+      service ?? (serviceId ? this.serviceDataLoader.load(serviceId) : null)
+    );
   }
 
   @Query(() => [BookingType], { name: 'customerBookings' })
@@ -53,7 +51,7 @@ export class BookingsResolver {
     @Args('status', { type: () => BookingStatus, nullable: true })
     status: BookingStatus | undefined,
     @CurrentUser() currentUser: CurrentUserPayload,
-  ): Promise<BookingEntity[]> {
+  ) {
     assertOwnerOrAdmin(userId, currentUser, 'view another user bookings');
     return this.bookingService.getCustomerBookings(userId, status);
   }
@@ -63,7 +61,7 @@ export class BookingsResolver {
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @Args('status', { type: () => BookingStatus, nullable: true })
     status?: BookingStatus,
-  ): Promise<BookingEntity[]> {
+  ) {
     return this.bookingService.getVendorBookings(vendorProfileId, status);
   }
 
@@ -71,34 +69,40 @@ export class BookingsResolver {
   async getBookingById(
     @Args('id', { type: () => ID }) id: string,
     @CurrentUser() currentUser: CurrentUserPayload,
-  ): Promise<BookingEntity> {
-    const booking = await this.bookingService.getBookingById(id);
-    assertOwnerOrAdmin(booking?.userId, currentUser, 'access this booking');
-    return booking;
+  ) {
+    return this.assertAndGetBooking(id, currentUser, 'access this booking');
   }
 
   @Mutation(() => BookingType)
   async createBooking(
     @Args('input') input: CreateBookingInput,
-    @CurrentUser() currentUser: CurrentUserPayload,
-  ): Promise<BookingEntity> {
-    input.userId = currentUser.sub;
+    @CurrentUser() { sub }: CurrentUserPayload,
+  ) {
+    input.userId = sub;
     return this.bookingService.createBooking(input);
   }
 
   @Mutation(() => BookingType)
   async updateBookingStatus(
     @Args('id', { type: () => ID }) id: string,
-    @Args('status', { type: () => BookingStatus })
-    status: BookingStatus,
+    @Args('status', { type: () => BookingStatus }) status: BookingStatus,
     @CurrentUser() currentUser: CurrentUserPayload,
-  ): Promise<BookingEntity> {
-    const booking = await this.bookingService.getBookingById(id);
-    assertOwnerOrAdmin(
-      booking?.userId,
+  ) {
+    await this.assertAndGetBooking(
+      id,
       currentUser,
       'update status for this booking',
     );
     return this.bookingService.updateBookingStatus(id, status);
+  }
+
+  private async assertAndGetBooking(
+    id: string,
+    currentUser: CurrentUserPayload,
+    action: string,
+  ): Promise<BookingEntity> {
+    const booking = await this.bookingService.getBookingById(id);
+    assertOwnerOrAdmin(booking.userId, currentUser, action);
+    return booking;
   }
 }
