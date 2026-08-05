@@ -31,7 +31,14 @@ export class UserService {
       throw new BadRequestException('Invalid or expired OTP');
     }
 
+    if (roleName === UserRole.SUPER_ADMIN) {
+      throw new BadRequestException(
+        'Super admin accounts cannot be registered or authenticated via phone OTP',
+      );
+    }
+
     let user = await this.repository.findByPhoneNumber(phoneNumber);
+    let effectiveRole: UserRole = roleName;
 
     if (!user) {
       const role = await this.rolesService.findByName(roleName);
@@ -41,11 +48,16 @@ export class UserService {
           roleId: role.id,
         }),
       );
+    } else if (user.roleId) {
+      const roleEntity = await this.rolesService.findById(user.roleId);
+      if (roleEntity) {
+        effectiveRole = roleEntity.name;
+      }
     }
 
     const token = await this.pasetoService.sign({
       sub: user.id,
-      role: roleName,
+      role: effectiveRole,
     });
 
     return { token, user };

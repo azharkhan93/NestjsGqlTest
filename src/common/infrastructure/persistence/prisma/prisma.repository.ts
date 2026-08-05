@@ -26,23 +26,31 @@ export abstract class PrismaRepository<
   }
 
   async findAll(): Promise<T[]> {
-    const results = await this.model.findMany();
-    return results.map((result) => this.toEntity(result));
+    const results = await this.model
+      .findMany({
+        where: { deletedAt: null },
+      })
+      .catch(() => this.model.findMany());
+    return results.map((result: PrismaModel) => this.toEntity(result));
   }
 
   async findOne(id: string): Promise<T | null> {
-    const result = await this.model.findUnique({
-      where: { id },
-    });
+    const result = await this.model
+      .findFirst({
+        where: { id, deletedAt: null },
+      })
+      .catch(() => this.model.findUnique({ where: { id } }));
     return result ? this.toEntity(result) : null;
   }
 
   async findByIds(ids: string[]): Promise<T[]> {
     if (!ids.length) return [];
-    const results = await this.model.findMany({
-      where: { id: { in: ids } },
-    });
-    return results.map((result) => this.toEntity(result));
+    const results = await this.model
+      .findMany({
+        where: { id: { in: ids }, deletedAt: null },
+      })
+      .catch(() => this.model.findMany({ where: { id: { in: ids } } }));
+    return results.map((result: PrismaModel) => this.toEntity(result));
   }
 
   async update(id: string, item: Partial<T>): Promise<T | null> {
@@ -55,9 +63,12 @@ export abstract class PrismaRepository<
   }
 
   async remove(id: string): Promise<T | null> {
-    const result = await this.model.delete({
-      where: { id },
-    });
+    const result = await this.model
+      .update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      })
+      .catch(() => this.model.delete({ where: { id } }));
     return result ? this.toEntity(result) : null;
   }
 }

@@ -21,6 +21,8 @@ import { DataLoadersModule } from './common/infrastructure/dataloaders/dataloade
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       context: ({ req, res }) => ({ req, res }),
+      introspection: process.env.NODE_ENV !== 'production',
+      playground: process.env.NODE_ENV !== 'production',
       validationRules: [depthLimit(5)],
       subscriptions: {
         'graphql-ws': true,

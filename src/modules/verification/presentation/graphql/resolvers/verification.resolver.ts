@@ -13,6 +13,7 @@ export class VerificationResolver {
     return this.verificationService.requestOtp(phoneNumber);
   }
 
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @Mutation(() => VerifyOtpResponseType, { name: 'verifyOtp' })
   async verifyOtp(
     @Args('phoneNumber') phoneNumber: string,
