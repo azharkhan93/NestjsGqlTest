@@ -84,12 +84,10 @@ export class UserService {
   async delete(id: string): Promise<boolean> {
     const user = await this.findById(id);
 
-    // 1. Delete avatar from Cloudinary if exists
     if (user.avatarPublicId) {
       await this.cloudinaryService.deleteFile(user.avatarPublicId);
     }
 
-    // 2. Delete user from repository
     assertFound(await this.repository.remove(id), `User ${id}`);
     return true;
   }
