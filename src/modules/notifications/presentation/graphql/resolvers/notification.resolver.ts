@@ -38,7 +38,15 @@ export class NotificationResolver {
     nullable: true,
   })
   @UseGuards(GqlAuthGuard)
-  async markNotificationAsRead(@Args('id', { type: () => ID }) id: string) {
+  async markNotificationAsRead(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    const notifications = await this.service.getUserNotifications(user.sub);
+    const belongsToUser = notifications.some((n) => n.id === id);
+    if (!belongsToUser) {
+      return null;
+    }
     return this.service.markAsRead(id);
   }
 

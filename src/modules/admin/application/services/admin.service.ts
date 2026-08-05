@@ -86,9 +86,22 @@ export class AdminService implements OnModuleInit {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.roleId) {
+      throw new UnauthorizedException(
+        'Access denied: User has no assigned role',
+      );
+    }
+
+    const role = await this.rolesService.findById(user.roleId);
+    if (role.name !== UserRole.SUPER_ADMIN) {
+      throw new UnauthorizedException(
+        'Access denied: Insufficient administrative privileges',
+      );
+    }
+
     const token = await this.pasetoService.sign({
       sub: user.id,
-      role: UserRole.SUPER_ADMIN,
+      role: role.name,
     });
 
     return { token, user };

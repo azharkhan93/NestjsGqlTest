@@ -7,8 +7,11 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, ForbiddenException } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
+import { CurrentUser } from '@common/presentation/decorators';
+import { CurrentUserPayload } from '@common/domain/interfaces';
+import { UserRole } from '@common/domain/enums';
 import { BookingService } from '@modules/bookings/application/services/booking.service';
 import {
   BookingEntity,
@@ -48,8 +51,17 @@ export class BookingsResolver {
   async getCustomerBookings(
     @Args('userId', { type: () => ID }) userId: string,
     @Args('status', { type: () => BookingStatus, nullable: true })
-    status?: BookingStatus,
+    status: BookingStatus | undefined,
+    @CurrentUser() currentUser: CurrentUserPayload,
   ): Promise<BookingEntity[]> {
+    if (
+      currentUser.sub !== userId &&
+      currentUser.role !== UserRole.SUPER_ADMIN
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to view another user bookings',
+      );
+    }
     return this.bookingService.getCustomerBookings(userId, status);
   }
 
@@ -65,14 +77,26 @@ export class BookingsResolver {
   @Query(() => BookingType, { name: 'bookingById' })
   async getBookingById(
     @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() currentUser: CurrentUserPayload,
   ): Promise<BookingEntity> {
-    return this.bookingService.getBookingById(id);
+    const booking = await this.bookingService.getBookingById(id);
+    if (
+      booking.userId !== currentUser.sub &&
+      currentUser.role !== UserRole.SUPER_ADMIN
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to access this booking',
+      );
+    }
+    return booking;
   }
 
   @Mutation(() => BookingType)
   async createBooking(
     @Args('input') input: CreateBookingInput,
+    @CurrentUser() currentUser: CurrentUserPayload,
   ): Promise<BookingEntity> {
+    input.userId = currentUser.sub;
     return this.bookingService.createBooking(input);
   }
 
@@ -81,7 +105,17 @@ export class BookingsResolver {
     @Args('id', { type: () => ID }) id: string,
     @Args('status', { type: () => BookingStatus })
     status: BookingStatus,
+    @CurrentUser() currentUser: CurrentUserPayload,
   ): Promise<BookingEntity> {
+    const booking = await this.bookingService.getBookingById(id);
+    if (
+      booking.userId !== currentUser.sub &&
+      currentUser.role !== UserRole.SUPER_ADMIN
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to update status for this booking',
+      );
+    }
     return this.bookingService.updateBookingStatus(id, status);
   }
 }

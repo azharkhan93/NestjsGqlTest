@@ -13,7 +13,13 @@ async function bootstrap() {
   );
   app.use(cookieParser());
   app.use(graphqlUploadExpress({ maxFileSize: 5000000, maxFiles: 1 }));
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
   setupCors(app);
   const port = process.env.PORT ?? 4000;
   await app.listen(port, '0.0.0.0');

@@ -10,9 +10,9 @@ export class BookingDataLoader {
   constructor(private readonly bookingRepository: IBookingRepository) {
     this.loader = new DataLoader<string, BookingEntity | null>(
       async (bookingIds: readonly string[]) => {
-        const bookings = await Promise.all(
-          bookingIds.map((id) => this.bookingRepository.findOne(id)),
-        );
+        const bookings = await this.bookingRepository.findByIds([
+          ...bookingIds,
+        ]);
         const bookingMap = new Map<string, BookingEntity>();
         bookings.forEach((b) => {
           if (b) bookingMap.set(b.id, b);

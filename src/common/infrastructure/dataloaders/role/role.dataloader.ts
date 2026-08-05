@@ -10,7 +10,7 @@ export class RoleDataLoader {
   constructor(private readonly roleRepository: IRoleRepository) {
     this.loader = new DataLoader<string, RoleEntity | null>(
       async (roleIds: readonly string[]) => {
-        const roles = await this.roleRepository.findAll();
+        const roles = await this.roleRepository.findByIds([...roleIds]);
         const roleMap = new Map<string, RoleEntity>(
           roles.map((r) => [r.id, r]),
         );

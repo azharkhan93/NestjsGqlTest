@@ -37,6 +37,14 @@ export abstract class PrismaRepository<
     return result ? this.toEntity(result) : null;
   }
 
+  async findByIds(ids: string[]): Promise<T[]> {
+    if (!ids.length) return [];
+    const results = await this.model.findMany({
+      where: { id: { in: ids } },
+    });
+    return results.map((result) => this.toEntity(result));
+  }
+
   async update(id: string, item: Partial<T>): Promise<T | null> {
     const data = this.toPrisma(item as T);
     const result = await this.model.update({

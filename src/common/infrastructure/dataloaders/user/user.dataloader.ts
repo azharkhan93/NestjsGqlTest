@@ -10,9 +10,7 @@ export class UserDataLoader {
   constructor(private readonly userRepository: IUserRepository) {
     this.loader = new DataLoader<string, UserEntity | null>(
       async (userIds: readonly string[]) => {
-        const users = await Promise.all(
-          userIds.map((id) => this.userRepository.findOne(id)),
-        );
+        const users = await this.userRepository.findByIds([...userIds]);
         const userMap = new Map<string, UserEntity>();
         users.forEach((u) => {
           if (u) userMap.set(u.id, u);

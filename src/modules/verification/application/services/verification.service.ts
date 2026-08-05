@@ -19,8 +19,10 @@ export class VerificationService {
     const phoneNumber = PhoneNumber.create(rawPhone);
     const val = phoneNumber.getValue;
 
-    // Direct static testing bypass for local/production client review
-    if (val === '+919999999999' || val === '+918888888888') {
+    const isDev = process.env.NODE_ENV !== 'production';
+
+    // Direct static testing bypass for local client review (Non-Production Only)
+    if (isDev && (val === '+919999999999' || val === '+918888888888')) {
       const code = val === '+919999999999' ? '111111' : '222222';
       const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
 
@@ -62,11 +64,13 @@ export class VerificationService {
   async verifyOtp(rawPhone: string, code: string) {
     const phoneNumber = PhoneNumber.create(rawPhone);
     const val = phoneNumber.getValue;
+    const isDev = process.env.NODE_ENV !== 'production';
 
-    // Static testing bypass for client verification
+    // Static testing bypass for client verification (Non-Production Only)
     if (
-      (val === '+919999999999' && code === '111111') ||
-      (val === '+918888888888' && code === '222222')
+      isDev &&
+      ((val === '+919999999999' && code === '111111') ||
+        (val === '+918888888888' && code === '222222'))
     ) {
       this.logger.log(
         `Bypassed verification matching for dummy test number ${val}`,

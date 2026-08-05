@@ -10,9 +10,9 @@ export class ServiceDataLoader {
   constructor(private readonly serviceRepository: IVendorServiceRepository) {
     this.loader = new DataLoader<string, VendorServiceEntity | null>(
       async (serviceIds: readonly string[]) => {
-        const services = await Promise.all(
-          serviceIds.map((id) => this.serviceRepository.findOne(id)),
-        );
+        const services = await this.serviceRepository.findByIds([
+          ...serviceIds,
+        ]);
         const serviceMap = new Map<string, VendorServiceEntity>();
         services.forEach((s) => {
           if (s) serviceMap.set(s.id, s);

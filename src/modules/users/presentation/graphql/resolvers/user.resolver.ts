@@ -7,8 +7,10 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from '@common/presentation/guards';
+import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { GqlAuthGuard, RolesGuard } from '@common/presentation/guards';
+import { Roles, CurrentUser } from '@common/presentation/decorators';
+import { CurrentUserPayload } from '@common/domain/interfaces';
 import { UserService } from '@modules/users/application/services/user.service';
 import { UserType } from '../types/user.type';
 import { RoleType } from '@modules/roles/presentation/graphql/types/role.type';
@@ -30,14 +32,23 @@ export class UserResolver {
   }
 
   @Query(() => [UserType])
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   async users() {
     return this.service.findAll();
   }
 
   @Query(() => UserType)
   @UseGuards(GqlAuthGuard)
-  async user(@Args('id', { type: () => ID }) id: string) {
+  async user(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() currentUser: CurrentUserPayload,
+  ) {
+    if (currentUser.sub !== id && currentUser.role !== UserRole.SUPER_ADMIN) {
+      throw new ForbiddenException(
+        'You are not authorized to view another user details',
+      );
+    }
     return this.service.findById(id);
   }
 
@@ -55,12 +66,19 @@ export class UserResolver {
   async updateUserAvatar(
     @Args('id', { type: () => ID }) id: string,
     @Args('avatarUrl') avatarUrl: string,
+    @CurrentUser() currentUser: CurrentUserPayload,
   ) {
+    if (currentUser.sub !== id && currentUser.role !== UserRole.SUPER_ADMIN) {
+      throw new ForbiddenException(
+        'You are not authorized to update another user avatar',
+      );
+    }
     return this.service.update(id, { avatarUrl });
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   async deleteUser(@Args('id', { type: () => ID }) id: string) {
     return this.service.delete(id);
   }

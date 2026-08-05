@@ -7,12 +7,13 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, ForbiddenException } from '@nestjs/common';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { VendorProfileType } from '@modules/vendors/presentation/graphql/types';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
+import { UserRole } from '@common/domain/enums';
 import {
   CreateVendorProfileInput,
   UpdateVendorProfileInput,
@@ -55,7 +56,7 @@ export class VendorProfileResolver {
     @Args('input') input: CreateVendorProfileInput,
     @CurrentUser() user: CurrentUserPayload,
   ) {
-    input.userId = input.userId || user?.sub || user?.id;
+    input.userId = user.sub;
     return this.service.createOrUpdate(input);
   }
 
@@ -64,7 +65,17 @@ export class VendorProfileResolver {
   async updateVendorProfile(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateVendorProfileInput,
+    @CurrentUser() user: CurrentUserPayload,
   ) {
+    const existing = await this.service.findById(id);
+    if (
+      !existing ||
+      (existing.userId !== user.sub && user.role !== UserRole.SUPER_ADMIN)
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to update this vendor profile',
+      );
+    }
     return this.service.update(id, input);
   }
 
@@ -75,7 +86,19 @@ export class VendorProfileResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
-  async deleteVendorProfile(@Args('id', { type: () => ID }) id: string) {
+  async deleteVendorProfile(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    const existing = await this.service.findById(id);
+    if (
+      !existing ||
+      (existing.userId !== user.sub && user.role !== UserRole.SUPER_ADMIN)
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to delete this vendor profile',
+      );
+    }
     return this.service.delete(id);
   }
 }

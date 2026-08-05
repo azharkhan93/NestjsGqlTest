@@ -1,26 +1,30 @@
 import { INestApplication, Logger } from '@nestjs/common';
 
-const DEFAULT_ORIGINS = new Set([
-  'http://localhost:8080',
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:8081',
-  'http://localhost:19006',
-  'https://27.100.38.251.sslip.io',
-  ...(process.env.CORS_ALLOWED_ORIGINS?.split(',').map((s) => s.trim()) ?? []),
-]);
-
 export const setupCors = (app: INestApplication): void => {
   const logger = new Logger('CORS');
   const isDev = process.env.NODE_ENV !== 'production';
+
+  const allowedOrigins = new Set(
+    (
+      process.env.CORS_ALLOWED_ORIGINS?.split(',').map((s) => s.trim()) ?? []
+    ).filter(Boolean),
+  );
+
+  if (isDev) {
+    allowedOrigins.add('http://localhost:8080');
+    allowedOrigins.add('http://localhost:3000');
+    allowedOrigins.add('http://localhost:3001');
+    allowedOrigins.add('http://localhost:8081');
+    allowedOrigins.add('http://localhost:19006');
+  }
 
   app.enableCors({
     origin: (origin, callback) => {
       if (
         !origin ||
         isDev ||
-        DEFAULT_ORIGINS.has(origin) ||
-        DEFAULT_ORIGINS.has('*')
+        allowedOrigins.has(origin) ||
+        allowedOrigins.has('*')
       ) {
         return callback(null, true);
       }

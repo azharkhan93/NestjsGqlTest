@@ -12,11 +12,9 @@ export class VendorProfileDataLoader {
   ) {
     this.loader = new DataLoader<string, VendorProfileEntity | null>(
       async (vendorProfileIds: readonly string[]) => {
-        const profiles = await Promise.all(
-          vendorProfileIds.map((id) =>
-            this.vendorProfileRepository.findOne(id),
-          ),
-        );
+        const profiles = await this.vendorProfileRepository.findByIds([
+          ...vendorProfileIds,
+        ]);
         const profileMap = new Map<string, VendorProfileEntity>();
         profiles.forEach((p) => {
           if (p) profileMap.set(p.id, p);

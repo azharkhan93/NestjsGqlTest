@@ -8,12 +8,14 @@ import {
   Float,
   Int,
 } from '@nestjs/graphql';
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
+import { GqlAuthGuard } from '@common/presentation/guards';
 import { TrackingService } from '../../../application/services/tracking.service';
 import { DriverLocationType } from '../types/driver-location.type';
 
 @Resolver(() => DriverLocationType)
+@UseGuards(GqlAuthGuard)
 export class TrackingResolver {
   constructor(
     private readonly service: TrackingService,
