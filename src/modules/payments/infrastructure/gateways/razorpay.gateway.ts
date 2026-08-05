@@ -54,7 +54,7 @@ export class RazorpayGateway implements IPaymentGateway {
             'X-Idempotency-Key': idempotencyKey,
           },
           body: JSON.stringify({
-            amount: Math.round(amount * 100), // convert to paise
+            amount: Math.round(amount * 100),
             currency,
             receipt,
           }),
