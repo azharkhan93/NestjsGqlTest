@@ -21,7 +21,6 @@ export class VerificationService {
 
     const isDev = process.env.NODE_ENV !== 'production';
 
-    // Direct static testing bypass for local client review (Non-Production Only)
     if (isDev && (val === '+919999999999' || val === '+918888888888')) {
       const code = val === '+919999999999' ? '111111' : '222222';
       const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
@@ -66,7 +65,6 @@ export class VerificationService {
     const val = phoneNumber.getValue;
     const isDev = process.env.NODE_ENV !== 'production';
 
-    // Static testing bypass for client verification (Non-Production Only)
     if (
       isDev &&
       ((val === '+919999999999' && code === '111111') ||
