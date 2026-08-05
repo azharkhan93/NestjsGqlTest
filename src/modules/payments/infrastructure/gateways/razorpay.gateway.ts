@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+  BadGatewayException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IPaymentGateway } from '../../domain/ports/payment-gateway.interface';
 import * as crypto from 'crypto';
@@ -67,7 +72,7 @@ export class RazorpayGateway implements IPaymentGateway {
             continue;
           }
 
-          throw new Error(
+          throw new BadGatewayException(
             `Razorpay order creation failed with status ${response.status}: ${response.statusText}`,
           );
         }
@@ -89,14 +94,18 @@ export class RazorpayGateway implements IPaymentGateway {
           this.logger.error(
             `Error creating Razorpay order after ${attempts} attempts: ${msg}`,
           );
-          throw new Error(`Failed to initialize payment after retries: ${msg}`);
+          throw new InternalServerErrorException(
+            `Failed to initialize payment after retries: ${msg}`,
+          );
         }
-        // Wait and retry for network/transient failures
+
         await new Promise((resolve) => setTimeout(resolve, 500 * attempts));
       }
     }
 
-    throw new Error('Failed to initialize payment: Max attempts exceeded');
+    throw new InternalServerErrorException(
+      'Failed to initialize payment: Max attempts exceeded',
+    );
   }
 
   verifySignature(

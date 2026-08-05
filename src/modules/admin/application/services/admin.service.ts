@@ -2,6 +2,7 @@ import {
   Injectable,
   OnModuleInit,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -13,6 +14,7 @@ import { PasetoService } from '@common/application/security/paseto.service';
 
 @Injectable()
 export class AdminService implements OnModuleInit {
+  private readonly logger = new Logger(AdminService.name);
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly rolesService: RolesService,
@@ -37,8 +39,8 @@ export class AdminService implements OnModuleInit {
     );
 
     if (!adminEmail || !adminPassword) {
-      console.warn(
-        '⚠️ SEED_SUPER_ADMIN is true, but SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD is missing in environment. Aborting super admin seeding.',
+      this.logger.warn(
+        'SEED_SUPER_ADMIN is true, but SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD is missing. Aborting seeding.',
       );
       return;
     }
@@ -46,7 +48,7 @@ export class AdminService implements OnModuleInit {
     const existingAdmin = await this.userRepository.findByEmail(adminEmail);
 
     if (existingAdmin) {
-      console.log('✅ Super Admin already exists');
+      this.logger.log('Super Admin already exists — skipping seed');
       return;
     }
 
@@ -63,11 +65,11 @@ export class AdminService implements OnModuleInit {
         }),
       );
 
-      console.log('🚀 Super Admin seeded successfully');
+      this.logger.log('Super Admin seeded successfully');
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      console.error('❌ Failed to seed Super Admin:', errorMessage);
+      this.logger.error(`Failed to seed Super Admin: ${errorMessage}`);
     }
   }
 

@@ -9,6 +9,7 @@ import {
 } from '../../domain/entities';
 import { FcmService } from '../../infrastructure/services/fcm.service';
 import { BookingService } from '@modules/bookings/application/services/booking.service';
+import { BookingNotificationType } from '../../domain/enums/booking-notification-type.enum';
 
 @Injectable()
 export class NotificationService {
@@ -67,7 +68,7 @@ export class NotificationService {
 
   async sendBookingNotification(
     bookingId: string,
-    type: 'JOURNEY_START' | 'JOURNEY_HALFWAY',
+    type: BookingNotificationType,
   ): Promise<boolean> {
     const booking = await this.bookingService.getBookingById(bookingId);
 
@@ -78,18 +79,21 @@ export class NotificationService {
     const customerUserId = booking.userId;
     const vendorName = booking.vendorProfile?.businessName ?? 'Your Vendor';
 
-    let title = '';
-    let body = '';
+    const messages: Record<
+      BookingNotificationType,
+      { title: string; body: string }
+    > = {
+      [BookingNotificationType.JOURNEY_START]: {
+        title: vendorName,
+        body: `${vendorName} is on the way to your location (within 5 minutes)`,
+      },
+      [BookingNotificationType.JOURNEY_HALFWAY]: {
+        title: vendorName,
+        body: `${vendorName} is halfway to your location`,
+      },
+    };
 
-    if (type === 'JOURNEY_START') {
-      title = vendorName;
-      body = `${vendorName} is on the way to your location (within 5 minutes)`;
-    } else if (type === 'JOURNEY_HALFWAY') {
-      title = vendorName;
-      body = `${vendorName} is halfway to your location`;
-    } else {
-      throw new Error(`Invalid booking notification type: ${type}`);
-    }
+    const { title, body } = messages[type];
 
     return this.sendPushNotification(customerUserId, title, body, {
       bookingId,

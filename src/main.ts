@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { setupCors } from '@common/application/helpers';
 import cookieParser from 'cookie-parser';
@@ -23,6 +23,6 @@ async function bootstrap() {
   setupCors(app);
   const port = process.env.PORT ?? 4000;
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 Server is running on http://0.0.0.0:${port}/graphql`);
+  new Logger('Bootstrap').log(`Server running on port ${port}`);
 }
 bootstrap();

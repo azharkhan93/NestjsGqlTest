@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, ForbiddenException } from '@nestjs/common';
 import { NotificationService } from '@modules/notifications/application/services';
 import {
   NotificationType,
@@ -9,56 +9,66 @@ import { RegisterDeviceTokenInput } from '@modules/notifications/presentation/gr
 import { GqlAuthGuard } from '@common/presentation/guards/index';
 import { CurrentUser } from '@common/presentation/decorators/index';
 import { CurrentUserPayload } from '@common/domain/interfaces';
+import { assertOwnerOrAdmin } from '@common/application/helpers';
+import { BookingService } from '@modules/bookings/application/services/booking.service';
+import { BookingNotificationType } from '@modules/notifications/domain/enums/booking-notification-type.enum';
 
 @Resolver()
+@UseGuards(GqlAuthGuard)
 export class NotificationResolver {
-  constructor(private readonly service: NotificationService) {}
+  constructor(
+    private readonly service: NotificationService,
+    private readonly bookingService: BookingService,
+  ) {}
 
   @Mutation(() => UserDeviceTokenType, { name: 'registerDeviceToken' })
-  @UseGuards(GqlAuthGuard)
   async registerDeviceToken(
     @Args('input') input: RegisterDeviceTokenInput,
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() { sub }: CurrentUserPayload,
   ) {
     return this.service.registerDeviceToken(
-      user.sub,
+      sub,
       input.fcmToken,
       input.deviceType,
     );
   }
 
   @Query(() => [NotificationType], { name: 'getUserNotifications' })
-  @UseGuards(GqlAuthGuard)
-  async getUserNotifications(@CurrentUser() user: CurrentUserPayload) {
-    return this.service.getUserNotifications(user.sub);
+  async getUserNotifications(@CurrentUser() { sub }: CurrentUserPayload) {
+    return this.service.getUserNotifications(sub);
   }
 
   @Mutation(() => NotificationType, {
     name: 'markNotificationAsRead',
     nullable: true,
   })
-  @UseGuards(GqlAuthGuard)
   async markNotificationAsRead(
     @Args('id', { type: () => ID }) id: string,
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() { sub }: CurrentUserPayload,
   ) {
-    const notifications = await this.service.getUserNotifications(user.sub);
+    const notifications = await this.service.getUserNotifications(sub);
     const belongsToUser = notifications.some((n) => n.id === id);
     if (!belongsToUser) {
-      return null;
+      throw new ForbiddenException(
+        'You are not authorized to mark this notification as read',
+      );
     }
     return this.service.markAsRead(id);
   }
 
   @Mutation(() => Boolean, { name: 'sendBookingNotification' })
-  @UseGuards(GqlAuthGuard)
   async sendBookingNotification(
     @Args('bookingId', { type: () => ID }) bookingId: string,
-    @Args('type') type: string,
+    @Args('type', { type: () => BookingNotificationType })
+    type: BookingNotificationType,
+    @CurrentUser() currentUser: CurrentUserPayload,
   ) {
-    if (type !== 'JOURNEY_START' && type !== 'JOURNEY_HALFWAY') {
-      throw new Error(`Invalid booking notification type: ${type}`);
-    }
+    const booking = await this.bookingService.getBookingById(bookingId);
+    assertOwnerOrAdmin(
+      booking?.userId,
+      currentUser,
+      'send notifications for this booking',
+    );
     return this.service.sendBookingNotification(bookingId, type);
   }
 }
