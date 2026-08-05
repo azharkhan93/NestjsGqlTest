@@ -7,10 +7,11 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard, RolesGuard } from '@common/presentation/guards';
 import { Roles, CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
+import { assertOwnerOrAdmin } from '@common/application/helpers';
 import { UserService } from '@modules/users/application/services/user.service';
 import { UserType } from '../types/user.type';
 import { RoleType } from '@modules/roles/presentation/graphql/types/role.type';
@@ -44,11 +45,7 @@ export class UserResolver {
     @Args('id', { type: () => ID }) id: string,
     @CurrentUser() currentUser: CurrentUserPayload,
   ) {
-    if (currentUser.sub !== id && currentUser.role !== UserRole.SUPER_ADMIN) {
-      throw new ForbiddenException(
-        'You are not authorized to view another user details',
-      );
-    }
+    assertOwnerOrAdmin(id, currentUser, 'view another user details');
     return this.service.findById(id);
   }
 
@@ -68,11 +65,7 @@ export class UserResolver {
     @Args('avatarUrl') avatarUrl: string,
     @CurrentUser() currentUser: CurrentUserPayload,
   ) {
-    if (currentUser.sub !== id && currentUser.role !== UserRole.SUPER_ADMIN) {
-      throw new ForbiddenException(
-        'You are not authorized to update another user avatar',
-      );
-    }
+    assertOwnerOrAdmin(id, currentUser, 'update another user avatar');
     return this.service.update(id, { avatarUrl });
   }
 

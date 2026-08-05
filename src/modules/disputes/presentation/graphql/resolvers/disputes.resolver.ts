@@ -7,10 +7,11 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
+import { assertOwnerOrAdmin } from '@common/application/helpers';
 import { DisputesService } from '@modules/disputes/application/services/disputes.service';
 import { BookingService } from '@modules/bookings/application/services/booking.service';
 import { DisputeType } from '@modules/disputes/presentation/graphql/types/dispute.type';
@@ -39,11 +40,7 @@ export class DisputesResolver {
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<DisputeType | null> {
     const booking = await this.bookingService.getBookingById(bookingId);
-    if (!booking || booking.userId !== user.sub) {
-      throw new ForbiddenException(
-        'You are not authorized to view disputes for this booking',
-      );
-    }
+    assertOwnerOrAdmin(booking?.userId, user, 'view disputes for this booking');
     return this.disputesService.getDisputeByBookingId(bookingId);
   }
 
@@ -53,11 +50,11 @@ export class DisputesResolver {
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<DisputeType> {
     const booking = await this.bookingService.getBookingById(input.bookingId);
-    if (!booking || booking.userId !== user.sub) {
-      throw new ForbiddenException(
-        'You are not authorized to create a dispute for this booking',
-      );
-    }
+    assertOwnerOrAdmin(
+      booking?.userId,
+      user,
+      'create a dispute for this booking',
+    );
     return this.disputesService.createDispute(input);
   }
 }

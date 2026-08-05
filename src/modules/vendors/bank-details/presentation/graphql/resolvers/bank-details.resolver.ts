@@ -1,9 +1,9 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
-import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
-import { UserRole } from '@common/domain/enums';
+import { assertOwnerOrAdmin } from '@common/application/helpers';
 import { BankDetailsService } from '@modules/vendors/bank-details/application/services';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { BankDetailsType } from '../types';
@@ -21,14 +21,13 @@ export class BankDetailsResolver {
     vendorProfileId: string,
     user: CurrentUserPayload,
   ): Promise<void> {
-    if (user.role === UserRole.SUPER_ADMIN) return;
     const vendorProfile =
       await this.vendorProfileService.findById(vendorProfileId);
-    if (!vendorProfile || vendorProfile.userId !== user.sub) {
-      throw new ForbiddenException(
-        'You are not authorized to manage bank details for this vendor profile',
-      );
-    }
+    assertOwnerOrAdmin(
+      vendorProfile?.userId,
+      user,
+      'manage bank details for this vendor profile',
+    );
   }
 
   @Query(() => BankDetailsType, { nullable: true })

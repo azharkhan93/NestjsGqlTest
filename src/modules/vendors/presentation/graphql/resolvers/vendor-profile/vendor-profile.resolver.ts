@@ -7,13 +7,13 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { VendorProfileType } from '@modules/vendors/presentation/graphql/types';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
-import { UserRole } from '@common/domain/enums';
+import { assertOwnerOrAdmin } from '@common/application/helpers';
 import {
   CreateVendorProfileInput,
   UpdateVendorProfileInput,
@@ -68,14 +68,7 @@ export class VendorProfileResolver {
     @CurrentUser() user: CurrentUserPayload,
   ) {
     const existing = await this.service.findById(id);
-    if (
-      !existing ||
-      (existing.userId !== user.sub && user.role !== UserRole.SUPER_ADMIN)
-    ) {
-      throw new ForbiddenException(
-        'You are not authorized to update this vendor profile',
-      );
-    }
+    assertOwnerOrAdmin(existing?.userId, user, 'update this vendor profile');
     return this.service.update(id, input);
   }
 
@@ -91,14 +84,7 @@ export class VendorProfileResolver {
     @CurrentUser() user: CurrentUserPayload,
   ) {
     const existing = await this.service.findById(id);
-    if (
-      !existing ||
-      (existing.userId !== user.sub && user.role !== UserRole.SUPER_ADMIN)
-    ) {
-      throw new ForbiddenException(
-        'You are not authorized to delete this vendor profile',
-      );
-    }
+    assertOwnerOrAdmin(existing?.userId, user, 'delete this vendor profile');
     return this.service.delete(id);
   }
 }

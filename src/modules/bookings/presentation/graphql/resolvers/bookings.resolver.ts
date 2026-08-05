@@ -7,11 +7,11 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
-import { UserRole } from '@common/domain/enums';
+import { assertOwnerOrAdmin } from '@common/application/helpers';
 import { BookingService } from '@modules/bookings/application/services/booking.service';
 import {
   BookingEntity,
@@ -54,14 +54,7 @@ export class BookingsResolver {
     status: BookingStatus | undefined,
     @CurrentUser() currentUser: CurrentUserPayload,
   ): Promise<BookingEntity[]> {
-    if (
-      currentUser.sub !== userId &&
-      currentUser.role !== UserRole.SUPER_ADMIN
-    ) {
-      throw new ForbiddenException(
-        'You are not authorized to view another user bookings',
-      );
-    }
+    assertOwnerOrAdmin(userId, currentUser, 'view another user bookings');
     return this.bookingService.getCustomerBookings(userId, status);
   }
 
@@ -80,14 +73,7 @@ export class BookingsResolver {
     @CurrentUser() currentUser: CurrentUserPayload,
   ): Promise<BookingEntity> {
     const booking = await this.bookingService.getBookingById(id);
-    if (
-      booking.userId !== currentUser.sub &&
-      currentUser.role !== UserRole.SUPER_ADMIN
-    ) {
-      throw new ForbiddenException(
-        'You are not authorized to access this booking',
-      );
-    }
+    assertOwnerOrAdmin(booking?.userId, currentUser, 'access this booking');
     return booking;
   }
 
@@ -108,14 +94,11 @@ export class BookingsResolver {
     @CurrentUser() currentUser: CurrentUserPayload,
   ): Promise<BookingEntity> {
     const booking = await this.bookingService.getBookingById(id);
-    if (
-      booking.userId !== currentUser.sub &&
-      currentUser.role !== UserRole.SUPER_ADMIN
-    ) {
-      throw new ForbiddenException(
-        'You are not authorized to update status for this booking',
-      );
-    }
+    assertOwnerOrAdmin(
+      booking?.userId,
+      currentUser,
+      'update status for this booking',
+    );
     return this.bookingService.updateBookingStatus(id, status);
   }
 }

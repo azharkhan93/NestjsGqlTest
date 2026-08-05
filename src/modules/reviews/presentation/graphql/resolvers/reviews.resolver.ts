@@ -7,10 +7,11 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
+import { assertOwnerOrAdmin } from '@common/application/helpers';
 import { ReviewsService } from '@modules/reviews/application/services/reviews.service';
 import { BookingService } from '@modules/bookings/application/services/booking.service';
 import { ReviewType } from '@modules/reviews/presentation/graphql/types/review.type';
@@ -35,21 +36,15 @@ export class ReviewsResolver {
   @Query(() => ReviewType, { name: 'reviewByBookingId', nullable: true })
   async getReviewByBookingId(
     @Args('bookingId', { type: () => ID }) bookingId: string,
-  ): Promise<ReviewType | null> {
-    const res = await this.reviewsService.getReviewByBookingId(bookingId);
-    if (!res) return null;
-    return { ...res, comment: res.comment ?? undefined } as ReviewType;
+  ) {
+    return this.reviewsService.getReviewByBookingId(bookingId);
   }
 
   @Query(() => [ReviewType], { name: 'vendorReviews' })
   async getVendorReviews(
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
-  ): Promise<ReviewType[]> {
-    const reviews = await this.reviewsService.getVendorReviews(vendorProfileId);
-    return reviews.map((r) => ({
-      ...r,
-      comment: r.comment ?? undefined,
-    })) as ReviewType[];
+  ) {
+    return this.reviewsService.getVendorReviews(vendorProfileId);
   }
 
   @Mutation(() => ReviewType)
@@ -57,14 +52,13 @@ export class ReviewsResolver {
   async createReview(
     @Args('input') input: CreateReviewInput,
     @CurrentUser() user: CurrentUserPayload,
-  ): Promise<ReviewType> {
+  ) {
     const booking = await this.bookingService.getBookingById(input.bookingId);
-    if (!booking || booking.userId !== user.sub) {
-      throw new ForbiddenException(
-        'You are not authorized to create a review for this booking',
-      );
-    }
-    const res = await this.reviewsService.createReview(input);
-    return { ...res, comment: res.comment ?? undefined } as ReviewType;
+    assertOwnerOrAdmin(
+      booking?.userId,
+      user,
+      'create a review for this booking',
+    );
+    return this.reviewsService.createReview(input);
   }
 }
