@@ -15,10 +15,8 @@ export class GqlAuthGuard implements CanActivate {
     const ctx = GqlExecutionContext.create(context);
     const { req } = ctx.getContext();
 
-    // Primary: read token from HTTP-Only cookie (set by adminLogin)
     let token: string | undefined = req.cookies?.token;
 
-    // Fallback: Authorization: Bearer <token> header
     if (!token) {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
