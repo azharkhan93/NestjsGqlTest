@@ -14,7 +14,6 @@ import { VendorServiceType } from '@modules/vendors/vendor-services/presentation
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
-import { assertOwnerOrAdmin } from '@common/application/helpers';
 import {
   CreateVendorServiceInput,
   UpdateVendorServiceInput,
@@ -30,16 +29,6 @@ export class VendorServiceResolver {
     private readonly vendorProfileService: VendorProfileService,
     private readonly vendorProfileDataLoader: VendorProfileDataLoader,
   ) {}
-
-  private async assertVendorOwnership(
-    vendorProfileId: string,
-    user: CurrentUserPayload,
-    action: string,
-  ): Promise<void> {
-    const vendorProfile =
-      await this.vendorProfileService.findById(vendorProfileId);
-    assertOwnerOrAdmin(vendorProfile?.userId, user, action);
-  }
 
   @ResolveField(() => VendorProfileType, { nullable: true })
   async vendorProfile(@Parent() vendorService: VendorServiceEntity) {
@@ -67,7 +56,7 @@ export class VendorServiceResolver {
     @Args('input') input: CreateVendorServiceInput,
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<VendorServiceType> {
-    await this.assertVendorOwnership(
+    await this.vendorProfileService.assertOwnership(
       input.vendorProfileId,
       user,
       'create service for this vendor profile',
@@ -83,7 +72,7 @@ export class VendorServiceResolver {
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<VendorServiceType> {
     const existing = await this.service.findOne(id);
-    await this.assertVendorOwnership(
+    await this.vendorProfileService.assertOwnership(
       existing.vendorProfileId,
       user,
       'update service for this vendor profile',
@@ -98,7 +87,7 @@ export class VendorServiceResolver {
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<boolean> {
     const existing = await this.service.findOne(id);
-    await this.assertVendorOwnership(
+    await this.vendorProfileService.assertOwnership(
       existing.vendorProfileId,
       user,
       'delete service for this vendor profile',

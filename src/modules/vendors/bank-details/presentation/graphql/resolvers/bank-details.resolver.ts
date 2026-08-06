@@ -3,7 +3,6 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { CurrentUser } from '@common/presentation/decorators';
 import { CurrentUserPayload } from '@common/domain/interfaces';
-import { assertOwnerOrAdmin } from '@common/application/helpers';
 import { BankDetailsService } from '@modules/vendors/bank-details/application/services';
 import { VendorProfileService } from '@modules/vendors/application/services';
 import { BankDetailsType } from '../types';
@@ -17,25 +16,16 @@ export class BankDetailsResolver {
     private readonly vendorProfileService: VendorProfileService,
   ) {}
 
-  private async assertVendorOwnership(
-    vendorProfileId: string,
-    user: CurrentUserPayload,
-  ): Promise<void> {
-    const vendorProfile =
-      await this.vendorProfileService.findById(vendorProfileId);
-    assertOwnerOrAdmin(
-      vendorProfile?.userId,
-      user,
-      'manage bank details for this vendor profile',
-    );
-  }
-
   @Query(() => BankDetailsType, { nullable: true })
   async getVendorBankDetails(
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<BankDetailsType | null> {
-    await this.assertVendorOwnership(vendorProfileId, user);
+    await this.vendorProfileService.assertOwnership(
+      vendorProfileId,
+      user,
+      'manage bank details for this vendor profile',
+    );
     return this.service.findByVendorProfileId(vendorProfileId);
   }
 
@@ -45,7 +35,11 @@ export class BankDetailsResolver {
     @Args('input') input: UpsertBankDetailsInput,
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<BankDetailsType> {
-    await this.assertVendorOwnership(vendorProfileId, user);
+    await this.vendorProfileService.assertOwnership(
+      vendorProfileId,
+      user,
+      'manage bank details for this vendor profile',
+    );
     return this.service.upsert(vendorProfileId, input);
   }
 
@@ -55,7 +49,12 @@ export class BankDetailsResolver {
     @Args('vendorProfileId', { type: () => ID }) vendorProfileId: string,
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<boolean> {
-    await this.assertVendorOwnership(vendorProfileId, user);
+    await this.vendorProfileService.assertOwnership(
+      vendorProfileId,
+      user,
+      'manage bank details for this vendor profile',
+    );
     return this.service.delete(id);
   }
 }
+

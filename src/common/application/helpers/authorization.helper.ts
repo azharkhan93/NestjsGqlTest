@@ -1,6 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { CurrentUserPayload } from '@common/domain/interfaces';
 import { UserRole } from '@common/domain/enums';
+import { DomainErrorMessages } from '@common/domain/exceptions/domain-error-messages.constants';
 
 export function assertOwnerOrAdmin(
   resourceUserId: string | null | undefined,
@@ -12,6 +13,8 @@ export function assertOwnerOrAdmin(
     (currentUser.sub !== resourceUserId &&
       currentUser.role !== UserRole.SUPER_ADMIN)
   ) {
-    throw new ForbiddenException(`You are not authorized to ${actionLabel}`);
+    throw new ForbiddenException(
+      DomainErrorMessages.UNAUTHORIZED_ACTION(actionLabel),
+    );
   }
 }

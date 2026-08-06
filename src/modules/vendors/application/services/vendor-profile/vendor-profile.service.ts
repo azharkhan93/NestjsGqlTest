@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { assertFound } from '@common/application/helpers';
+import { assertFound, assertOwnerOrAdmin } from '@common/application/helpers';
+import { CurrentUserPayload } from '@common/domain/interfaces';
 import { IVendorProfileRepository } from '@modules/vendors/domain/repositories';
 import { VendorProfileEntity } from '@modules/vendors/domain/entities';
 import {
@@ -21,7 +22,7 @@ export class VendorProfileService {
 
   async update(id: string, input: UpdateVendorProfileInput) {
     return assertFound(
-      await this.repository.update(id, input as any),
+      await this.repository.update(id, input as Partial<VendorProfileEntity>),
       `Vendor profile ${id}`,
     );
   }
@@ -32,6 +33,16 @@ export class VendorProfileService {
 
   async findById(id: string) {
     return assertFound(await this.repository.findOne(id), `Profile ${id}`);
+  }
+
+  async assertOwnership(
+    vendorProfileId: string,
+    currentUser: CurrentUserPayload,
+    action: string = 'manage this vendor profile',
+  ): Promise<VendorProfileEntity> {
+    const profile = await this.findById(vendorProfileId);
+    assertOwnerOrAdmin(profile.userId, currentUser, action);
+    return profile;
   }
 
   async findAll() {
