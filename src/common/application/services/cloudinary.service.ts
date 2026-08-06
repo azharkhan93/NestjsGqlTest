@@ -18,17 +18,25 @@ export class CloudinaryService {
   ): Promise<UploadApiResponse> {
     this.fileValidator.validate(fileBuffer, mimeType, fileBuffer.length);
 
+    const isPdf = mimeType === 'application/pdf';
+
     return new Promise((resolve, reject) => {
       const upload = cloudinary.uploader.upload_stream(
         {
-          resource_type: 'auto',
           folder,
+          ...(isPdf
+            ? { resource_type: 'raw' }
+            : {
+                resource_type: 'image',
+                format: 'webp',
+                quality: 'auto:good',
+              }),
         },
-        (error: UploadApiErrorResponse, result: UploadApiResponse) => {
-          if (error) {
+        (error?: UploadApiErrorResponse, result?: UploadApiResponse) => {
+          if (error || !result) {
             return reject(
               new InternalServerErrorException(
-                `Cloudinary upload failed: ${error.message}`,
+                `Cloudinary upload failed: ${error?.message ?? 'Unknown error'}`,
               ),
             );
           }
@@ -40,18 +48,24 @@ export class CloudinaryService {
     });
   }
 
-  async deleteFile(publicId: string): Promise<any> {
+  async deleteFile(publicId: string): Promise<{ result: string }> {
     return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(publicId, (error, result) => {
-        if (error) {
-          return reject(
-            new InternalServerErrorException(
-              `Cloudinary deletion failed: ${error.message}`,
-            ),
-          );
-        }
-        resolve(result);
-      });
+      cloudinary.uploader.destroy(
+        publicId,
+        (
+          error: UploadApiErrorResponse | undefined,
+          result: { result: string },
+        ) => {
+          if (error) {
+            return reject(
+              new InternalServerErrorException(
+                `Cloudinary deletion failed: ${error.message}`,
+              ),
+            );
+          }
+          resolve(result);
+        },
+      );
     });
   }
 }
