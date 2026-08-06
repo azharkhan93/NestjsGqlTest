@@ -57,4 +57,3 @@ export class BankDetailsResolver {
     return this.service.delete(id);
   }
 }
-
