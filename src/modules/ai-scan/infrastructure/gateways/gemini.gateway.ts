@@ -26,6 +26,9 @@ export class GeminiGateway implements IAiScanGateway {
       return FALLBACK_SCAN_RESULT;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
     try {
       const parts = [
         { text: GEMINI_VEHICLE_ANALYSIS_PROMPT },
@@ -39,6 +42,7 @@ export class GeminiGateway implements IAiScanGateway {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             contents: [{ parts }],
             generationConfig: { response_mime_type: 'application/json' },
@@ -46,22 +50,25 @@ export class GeminiGateway implements IAiScanGateway {
         },
       );
 
+      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`Status ${res.status}: ${await res.text()}`);
 
       const data = (await res.json()) as {
         candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
       };
 
-      const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      return rawJson
-        ? new VehicleScanResultEntity(
-            JSON.parse(rawJson) as VehicleScanResultEntity,
-          )
-        : FALLBACK_SCAN_RESULT;
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) return FALLBACK_SCAN_RESULT;
+
+      const cleanJson = rawText.replace(/```json|```/g, '').trim();
+      return new VehicleScanResultEntity(
+        JSON.parse(cleanJson) as VehicleScanResultEntity,
+      );
     } catch (error: unknown) {
+      clearTimeout(timeoutId);
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `Gemini API failed (${msg}). Returning fallback result.`,
+        `Gemini API error (${msg}). Serving fallback scan result.`,
       );
       return FALLBACK_SCAN_RESULT;
     }

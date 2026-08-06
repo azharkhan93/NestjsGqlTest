@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, BadRequestException } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { GqlAuthGuard } from '@common/presentation/guards';
 import { AiScanService } from '../../../application/services/ai-scan.service';
@@ -15,6 +15,10 @@ export class AiScanResolver {
   async scanVehicleCondition(
     @Args('base64Images', { type: () => [String] }) base64Images: string[],
   ): Promise<VehicleScanResultType> {
+    if (!base64Images || base64Images.length === 0) {
+      throw new BadRequestException('At least one vehicle image is required');
+    }
+
     const imageBuffers: Buffer[] = base64Images.map((base64: string) => {
       const cleanBase64 = base64.replace(/^data:image\/\w+;base64,/, '');
       return Buffer.from(cleanBase64, 'base64');
