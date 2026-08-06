@@ -1,6 +1,8 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from '@common/presentation/guards';
+import { GqlAuthGuard, RolesGuard } from '@common/presentation/guards';
+import { Roles } from '@common/presentation/decorators';
+import { UserRole } from '@common/domain/enums';
 import { ServiceCategory } from '@modules/cms/service-category/presentation/graphql/types';
 import { ServiceCategoryService } from '@modules/cms/service-category/application/services';
 import {
@@ -21,7 +23,8 @@ export class ServiceCategoryResolver {
   }
 
   @Mutation(() => ServiceCategory)
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   async createServiceCategory(
     @Args('input') input: CreateServiceCategoryInput,
   ) {
@@ -29,7 +32,8 @@ export class ServiceCategoryResolver {
   }
 
   @Mutation(() => ServiceCategory)
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   async updateServiceCategory(
     @Args('id') id: string,
     @Args('input') input: UpdateServiceCategoryInput,
@@ -42,13 +46,15 @@ export class ServiceCategoryResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   async deleteServiceCategory(@Args('id') id: string) {
     return this.serviceCategoryService.deleteCategory(id);
   }
 
   @Mutation(() => [ServiceCategory])
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   async syncServiceCategories(
     @Args('categories', { type: () => [SyncServiceCategoryInput] })
     categories: SyncServiceCategoryInput[],

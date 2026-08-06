@@ -13,6 +13,7 @@ export class FileValidatorService {
   private readonly MAGIC_NUMBERS: Record<string, number[]> = {
     'image/jpeg': [0xff, 0xd8, 0xff],
     'image/png': [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+    'image/webp': [0x52, 0x49, 0x46, 0x46], // RIFF header
     'application/pdf': [0x25, 0x50, 0x44, 0x46],
   };
 
@@ -30,11 +31,26 @@ export class FileValidatorService {
     }
 
     const magic = this.MAGIC_NUMBERS[mimeType];
-    if (magic) {
-      for (let i = 0; i < magic.length; i++) {
-        if (buffer[i] !== magic[i]) {
+    if (!magic) {
+      throw new BadRequestException(
+        'Malicious file detected: Missing signature configuration for mime type.',
+      );
+    }
+
+    for (let i = 0; i < magic.length; i++) {
+      if (buffer[i] !== magic[i]) {
+        throw new BadRequestException(
+          'Malicious file detected: File signature does not match the mime type.',
+        );
+      }
+    }
+
+    if (mimeType === 'image/webp') {
+      const webpHeader = [0x57, 0x45, 0x42, 0x50]; // WEBP
+      for (let i = 0; i < webpHeader.length; i++) {
+        if (buffer[8 + i] !== webpHeader[i]) {
           throw new BadRequestException(
-            'Malicious file detected: File signature does not match the mime type.',
+            'Malicious file detected: WebP container header does not match.',
           );
         }
       }
