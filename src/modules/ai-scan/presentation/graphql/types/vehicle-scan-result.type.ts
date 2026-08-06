@@ -50,6 +50,12 @@ export class RecommendedPackageType {
   @Field()
   reason: string;
 
+  @Field(() => Float, { nullable: true })
+  originalPrice?: number;
+
+  @Field(() => Float, { nullable: true })
+  discountedPrice?: number;
+
   @Field(() => [String])
   suggestedAddons: string[];
 }
@@ -58,6 +64,12 @@ export class RecommendedPackageType {
 export class VehicleScanResultType {
   @Field()
   isVehicleDetected: boolean;
+
+  @Field({ nullable: true })
+  vehicleType?: string;
+
+  @Field({ nullable: true })
+  estimatedColor?: string;
 
   @Field(() => Int)
   overallConditionScore: number;

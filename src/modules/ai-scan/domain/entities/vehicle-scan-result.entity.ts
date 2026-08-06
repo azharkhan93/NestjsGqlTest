@@ -14,11 +14,15 @@ export interface RecommendedPackageEntity {
   readonly packageId: string;
   readonly title: string;
   readonly reason: string;
+  readonly originalPrice?: number;
+  readonly discountedPrice?: number;
   readonly suggestedAddons: readonly string[];
 }
 
 export class VehicleScanResultEntity {
   readonly isVehicleDetected: boolean;
+  readonly vehicleType?: string;
+  readonly estimatedColor?: string;
   readonly overallConditionScore: number;
   readonly detectedConditions: readonly DetectedConditionEntity[];
   readonly recommendedPackage: RecommendedPackageEntity;
@@ -26,6 +30,8 @@ export class VehicleScanResultEntity {
 
   constructor(partial: Partial<VehicleScanResultEntity>) {
     this.isVehicleDetected = partial.isVehicleDetected ?? false;
+    this.vehicleType = partial.vehicleType;
+    this.estimatedColor = partial.estimatedColor;
     this.overallConditionScore = partial.overallConditionScore ?? 5;
     this.detectedConditions = partial.detectedConditions ?? [];
     this.recommendedPackage = partial.recommendedPackage ?? {

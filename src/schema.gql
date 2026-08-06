@@ -311,11 +311,15 @@ type RecommendedPackageType {
   packageId: String!
   title: String!
   reason: String!
+  originalPrice: Float
+  discountedPrice: Float
   suggestedAddons: [String!]!
 }
 
 type VehicleScanResultType {
   isVehicleDetected: Boolean!
+  vehicleType: String
+  estimatedColor: String
   overallConditionScore: Int!
   detectedConditions: [DetectedConditionType!]!
   recommendedPackage: RecommendedPackageType!

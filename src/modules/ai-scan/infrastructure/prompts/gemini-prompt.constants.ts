@@ -6,6 +6,8 @@ export const GEMINI_VEHICLE_ANALYSIS_PROMPT = `
 You are an expert automotive detailing technician. Analyze the provided vehicle photos and respond in strict JSON adhering to this structure:
 {
   "isVehicleDetected": true,
+  "vehicleType": "Sedan (Metallic Blue)",
+  "estimatedColor": "#1E293B",
   "overallConditionScore": 6,
   "detectedConditions": [
     {
@@ -29,6 +31,8 @@ You are an expert automotive detailing technician. Analyze the provided vehicle 
     "packageId": "deluxe_foam_detailing",
     "title": "Deluxe Foam Wash & Decontamination",
     "reason": "Recommended to safely strip road grime and apply clear coat protection.",
+    "originalPrice": 69.99,
+    "discountedPrice": 49.99,
     "suggestedAddons": ["clay_bar_treatment", "tire_shine"]
   }
 }
@@ -36,6 +40,8 @@ You are an expert automotive detailing technician. Analyze the provided vehicle 
 
 export const FALLBACK_SCAN_RESULT = new VehicleScanResultEntity({
   isVehicleDetected: true,
+  vehicleType: 'Sedan (Gloss Paint)',
+  estimatedColor: '#1E293B',
   overallConditionScore: 7,
   detectedConditions: [
     {
@@ -68,6 +74,8 @@ export const FALLBACK_SCAN_RESULT = new VehicleScanResultEntity({
     title: 'Deluxe Foam Wash & Paint Protection',
     reason:
       'AI analysis recommends a multi-stage foam wash paired with wheel iron decontaminant.',
+    originalPrice: 69.99,
+    discountedPrice: 49.99,
     suggestedAddons: ['clay_bar_decon', 'ceramic_tire_glaze'],
   },
 });
