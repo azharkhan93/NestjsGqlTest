@@ -15,6 +15,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { DisputesModule } from './disputes/disputes.module';
+import { AiScanModule } from './ai-scan/ai-scan.module';
 
 @Module({
   imports: [
@@ -33,6 +34,8 @@ import { DisputesModule } from './disputes/disputes.module';
     BookingsModule,
     ReviewsModule,
     DisputesModule,
+    AiScanModule,
   ],
 })
 export class ModulesModule {}
+

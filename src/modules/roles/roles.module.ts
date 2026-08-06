@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
+import { CommonModule } from '@common/common.module';
 import { RolesService } from './application/services/roles.service';
 import { RolesResolver } from './presentation/graphql/resolvers/roles.resolver';
 import { IRoleRepository } from './domain/repositories/role.repository.interface';
 import { RoleRepository } from './infrastructure/persistence/repositories/role.repository';
 
 @Module({
+  imports: [CommonModule],
   providers: [
     RolesService,
     RolesResolver,

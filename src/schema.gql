@@ -283,6 +283,45 @@ type Dispute {
   booking: Booking
 }
 
+type DetectedConditionType {
+  id: String!
+  category: ConditionCategory!
+  name: String!
+  severity: ConditionSeverity!
+  confidenceScore: Float!
+  summary: String!
+}
+
+"""Categories of detected vehicle surface conditions"""
+enum ConditionCategory {
+  DIRT
+  PAINT
+  WHEELS
+  INTERIOR
+}
+
+"""Severity levels of vehicle surface flaws"""
+enum ConditionSeverity {
+  LIGHT
+  MODERATE
+  SEVERE
+}
+
+type RecommendedPackageType {
+  packageId: String!
+  title: String!
+  reason: String!
+  suggestedAddons: [String!]!
+}
+
+type VehicleScanResultType {
+  isVehicleDetected: Boolean!
+  overallConditionScore: Int!
+  detectedConditions: [DetectedConditionType!]!
+  recommendedPackage: RecommendedPackageType!
+  retakeGuidance: String
+}
+
 type Query {
   roles: [Role!]!
   roleById(id: String!): Role!
@@ -323,7 +362,7 @@ type Mutation {
   updateVendorProfile(id: ID!, input: UpdateVendorProfileInput!): VendorProfileType!
   deleteVendorProfile(id: ID!): Boolean!
   upsertVendorBankDetails(vendorProfileId: ID!, input: UpsertBankDetailsInput!): BankDetailsType!
-  deleteVendorBankDetails(id: ID!): Boolean!
+  deleteVendorBankDetails(id: ID!, vendorProfileId: ID!): Boolean!
   createVendorService(input: CreateVendorServiceInput!): VendorService!
   updateVendorService(id: ID!, input: UpdateVendorServiceInput!): VendorService!
   deleteVendorService(id: ID!): Boolean!
@@ -355,11 +394,12 @@ type Mutation {
   updateDriverLocation(bookingId: ID!, latitude: Float!, longitude: Float!, status: String!, eta: Int!): DriverLocationType!
   registerDeviceToken(input: RegisterDeviceTokenInput!): UserDeviceTokenType!
   markNotificationAsRead(id: ID!): NotificationType
-  sendBookingNotification(bookingId: ID!, type: String!): Boolean!
+  sendBookingNotification(bookingId: ID!, type: BookingNotificationType!): Boolean!
   createPayment(input: CreatePaymentInput!): Payment!
   verifyPaymentSuccess(input: VerifyPaymentInput!): Payment!
   createReview(input: CreateReviewInput!): Review!
   createDispute(input: CreateDisputeInput!): Dispute!
+  scanVehicleCondition(base64Images: [String!]!): VehicleScanResultType!
 }
 
 input CreateVendorProfileInput {
@@ -523,6 +563,12 @@ input UpsertCustomerAddressInput {
 input RegisterDeviceTokenInput {
   fcmToken: String!
   deviceType: String!
+}
+
+"""Valid push notification triggers for a booking journey"""
+enum BookingNotificationType {
+  JOURNEY_START
+  JOURNEY_HALFWAY
 }
 
 input CreatePaymentInput {
