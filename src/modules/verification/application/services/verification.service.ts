@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { randomInt } from 'crypto';
 import { PhoneNumber } from '@common/domain/value-objects/phone-number.vo';
-import { ISmsGateway } from '@modules/twilio/domain/ports';
+import { ISmsGateway } from '@modules/sms/domain/ports';
 import { IVerificationRepository } from '@modules/verification/domain/repositories/verification.repository.interface';
 
 const OTP_EXPIRY_MS = 2 * 60 * 1000;
@@ -32,12 +32,12 @@ export class VerificationService {
       });
 
       this.logger.log(
-        `Bypassed Twilio SMS for dummy test number ${val} - Code set to ${code}`,
+        `Bypassed SMS gateway for dummy test number ${val} - Code set to ${code}`,
       );
       return {
         success: true,
         sid: 'DUMMY_SMS_SID',
-        message: 'OTP generated (Bypassed Twilio)',
+        message: 'OTP generated (Bypassed SMS gateway)',
       };
     }
 

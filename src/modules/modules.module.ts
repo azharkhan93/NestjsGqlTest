@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { RolesModule } from './roles/roles.module';
-import { TwilioModule } from './twilio/twilio.module';
+import { SmsModule } from './sms/sms.module';
 import { VerificationModule } from './verification/verification.module';
 import { VendorsModule } from './vendors/vendors.module';
 import { UsersModule } from './users/users.module';
@@ -20,7 +20,7 @@ import { AiScanModule } from './ai-scan/ai-scan.module';
 @Module({
   imports: [
     RolesModule,
-    TwilioModule,
+    SmsModule,
     VerificationModule,
     VendorsModule,
     UsersModule,
@@ -38,4 +38,3 @@ import { AiScanModule } from './ai-scan/ai-scan.module';
   ],
 })
 export class ModulesModule {}
-
